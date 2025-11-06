@@ -1,0 +1,45 @@
+.carrossel{
+    margin: 100px auto;
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+    gap: 1em;
+    overflow: hidden;
+}
+
+.carrossel::-webkit-scrollbar{
+    display: none;
+}
+
+.group{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+    animation: roll 10s infinite linear;
+    padding-right: 1em;
+}
+
+.cardDestaque{
+    flex: 0 0 5em;
+    height: 7em;
+    padding: 1em;
+    font-size: 3rem;
+    text-align: center;
+    align-content: center;
+    transition: all ease 0.5s;
+}
+
+.cardDestaque img{
+    border-radius: 2vh;
+    height: 7em;
+}
+
+.cardDestaque:hover{
+    transform: scale(1.05);
+}
+
+@keyframes roll{
+    from{translate: 0;}
+    to{translate: -100%;}
+}

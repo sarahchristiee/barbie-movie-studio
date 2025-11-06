@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
+
+body {
+  margin: 0;
+}
+
+.montserrat-text {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lilita-one-regular {
+  font-family: "Lilita One", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Barbie';
+  src: url('../../assets/fontes/Barbie.ttf') format('truetype');
+}
+
+/* --- Texto inicial --- */
+
+.textoInicial {
+  position: relative;
+  z-index: 10;
+  top: 25vh;
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(2.5rem, 8vw, 9rem);
+  font-family: 'Barbie';
+  font-weight: 100;
+  text-shadow: 2px 2px 4px #DF1683;
+}
+
+h2 {
+  text-shadow: 2px 2px 4px #DF1683;
+  font-family: "Lilita One";
+  font-weight: 100;
+  font-size: clamp(1.2rem, 3vw, 3rem);
+}
+
+p {
+  text-align: center;
+  margin: 0 auto 6vh auto;
+  font-size: clamp(1rem, 2vw, 2rem);
+  width: min(80%, 60ch);
+  font-family: "Montserrat", sans-serif;
+  line-height: 1.8;
+}
+
+.explorar {
+  color: white;
+  display: inline-block;
+  background-color: #EB3A58;
+  padding: 1.5rem 2.5rem;
+  text-align: center;
+  border: transparent 0.25rem solid;
+  transition: transform 0.3s ease;
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+}
+
+.explorar:hover {
+  transform: scale(1.1);
+  border: white 0.25rem solid;
+}
+
+/* --- Cards --- */
+
+.cards {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5vw;
+  top: 70vh;
+  z-index: 10;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.cards h3 {
+  font-family: "Lilita One", sans-serif;
+  font-weight: 100;
+  color: #DF1683;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  text-align: center;
+}
+
+.cards p {
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  width: min(90%, 40ch);
+}
+
+.icon {
+  color: #DF1683;
+}
+
+.cards article {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  width: clamp(18rem, 40vw, 28rem);
+  height: clamp(12rem, 25vw, 15rem);
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.cards article:hover {
+  transform: scale(1.08);
+}
+
+/* --- Destaques --- */
+
+.destaques {
+  position: relative;
+  text-align: center;
+  top: 85vh;
+  z-index: 20;
+  justify-items: center;
+}
+
+.destaques h1 {
+  color: white;
+  position: relative;
+  top: 8vh;
+}
+
+.destaque {
+  display: inline-block;
+  background-color: white;
+}
+
+.filmesDestaque {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 5vw;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 10;
+  top: 20vh;
+}
+
+.filmesDestaque img {
+  width: clamp(12rem, 20vw, 25rem);
+  height: auto;
+  padding: 1rem;
+}
+
+/* --- Imagens decorativas --- */
+
+.imagens {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: visible;
+  z-index: 1;
+  bottom: 140vh;
+}
+
+.camera {
+  position: absolute;
+  width: 20%;
+  left: 3%;
+  bottom: 18%;
+}
+
+.claquete {
+  position: absolute;
+  width: 15%;
+  left: 12%;
+  bottom: 28%;
+  z-index: 1;
+}
+
+.cadeira {
+  position: absolute;
+  width: 18%;
+  right: 16%;
+  bottom: 20%;
+  z-index: 1;
+}
+
+.holofote {
+  position: absolute;
+  width: 12%;
+  right: 5%;
+  bottom: 20%;
+  z-index: 1;
+}
+
+.tapete {
+  position: relative;
+  z-index: -1;
+  bottom: 190vh;
+  width: 100%;
+}
+
+.fimTapete {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  bottom: 191vh;
+}
+
+.filmes {
+  position: relative;
+  bottom: 170vh;
+  text-align: center;
+  justify-items: center;
+}
+
+#explorar {
+  position: relative;
+  top: 10vh;
+  color: white;
+}
+
+.textoFilmes {
+  color: #DF1683;
+  text-shadow: 2px 2px 4px #df16858f;
+  position: relative;
+  top: -10vh;
+}
+
+/* --- Animação Scroll --- */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.8s ease-out;
+}
+
+.scroll-reveal.show {
+  opacity: 1;
+  transform: translateY(0);
+}

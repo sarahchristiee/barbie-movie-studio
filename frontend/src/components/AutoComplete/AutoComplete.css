@@ -1,0 +1,21 @@
+.autocomplete-container {
+  width: 350px;
+  background-color: #ffffff;
+  border-radius: 3vh;
+}
+
+.autocomplete-container .MuiOutlinedInput-root {
+  border-radius: 3vh;
+}
+
+.autocomplete-container .MuiInputLabel-root {
+  color: #DF1683;
+}
+
+.autocomplete-container .MuiOutlinedInput-notchedOutline {
+  border-color: #DF1683;
+}
+
+.search-icon {
+  color: #DF1683;
+}

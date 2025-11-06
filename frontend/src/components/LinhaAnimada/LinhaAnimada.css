@@ -1,0 +1,86 @@
+.linha-animada {
+  position: relative;
+  width: 600px;
+  height: 18px;
+  margin: 0px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.linha {
+  position: absolute;
+  height: 5px;
+  background: #ffffff;
+  width: 0;
+}
+
+.estrela {
+  position: absolute;
+  font-size: 60px;
+  color: white;
+  opacity: 0;
+  margin-bottom: 3vh;
+  transform: scale(0);
+}
+
+/* Estado inicial */
+.linha-animada:not(.ativo) .linha,
+.linha-animada:not(.ativo) .estrela {
+  animation: none !important;
+}
+
+/* Estado ativo: dispara as animações */
+.linha-animada.ativo .linha {
+  animation: crescer 1.2s ease-out forwards;
+}
+
+.linha-animada.ativo .esquerda {
+  animation: estrela-esquerda 1.2s ease-out forwards;
+}
+
+.linha-animada.ativo .direita {
+  animation: estrela-direita 1.2s ease-out forwards;
+}
+
+
+
+/* animações */
+@keyframes crescer {
+  0% { width: 0; }
+  100% { width: 100%; }
+}
+
+@keyframes estrela-esquerda {
+  0% {
+    left: 50%;
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    left: -6vh;
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes estrela-direita {
+  0% {
+    right: 50%;
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    right: -6vh;
+    opacity: 1;
+    transform: scale(1);
+  }
+}

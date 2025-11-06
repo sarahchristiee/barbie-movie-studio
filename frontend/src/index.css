@@ -1,0 +1,17 @@
+body{
+    background: linear-gradient(90deg, #FD76AB 0%, #FFAACB 98%);
+    margin: 0;
+}
+
+body::-webkit-scrollbar {
+  background-color: #ffffff;
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: #FD76AB;
+  border-radius: 20px;
+}
+
+html {
+  scroll-behavior: smooth;
+}

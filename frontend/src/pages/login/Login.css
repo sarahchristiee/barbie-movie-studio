@@ -1,0 +1,79 @@
+body, html {
+    margin: 0;
+    height: 100%;
+    font-family: "Montserrat", sans-serif;
+}
+
+.loginContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.loginBox {
+    background-color: #fff;
+    width: 450px;
+    height: 420px; 
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.loginTitle {
+    text-align: center;
+    color: #e91e63;
+    font-family: 'barbie';
+    font-size: 4rem;
+    text-shadow: 2px 2px #fff;
+    margin-bottom: 30px;
+}
+
+.loginBox label {
+    color: #e91e63;
+    margin-left: 0;
+    margin-bottom: 5px;
+    display: block;
+    font-family: "Lilita One";
+    text-align: left;
+    width: 100%;
+}
+
+.loginBox input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    border: 2px solid #e91e63;
+    font-size: 16px;
+    outline: none;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.loginBox input:focus {
+    background-color: #FFAACB;
+    color: black;
+}
+
+.loginBox button {
+    width: 100%; 
+    background-color: #e91e63;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    cursor: pointer;
+    font-family: "Lilita One";
+    transition: 0.3s;
+    margin-top: 20px;
+}
+
+.loginBox button:hover {
+    background-color: #c2185b;
+}
