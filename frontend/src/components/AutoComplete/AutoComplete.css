@@ -1,21 +1,35 @@
 .autocomplete-container {
   width: 350px;
   background-color: #ffffff;
-  border-radius: 3vh;
+  border-radius: 10vh;
+  font-family: "Montserrat";
 }
 
 .autocomplete-container .MuiOutlinedInput-root {
-  border-radius: 3vh;
+  border-radius: 10vh;
+  font-family: "Montserrat";
 }
 
 .autocomplete-container .MuiInputLabel-root {
   color: #DF1683;
+  font-family: "Montserrat";
 }
 
-.autocomplete-container .MuiOutlinedInput-notchedOutline {
-  border-color: #DF1683;
-}
+
 
 .search-icon {
   color: #DF1683;
 }
+
+/* Quando o campo é focado (clicado) */
+.autocomplete-container .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #821e4c !important;
+  font-family: "Montserrat";
+}
+
+/* Cor da seta (ícone dropdown) */
+.autocomplete-container .MuiAutocomplete-popupIndicator {
+  color: #DF1683 !important;
+  font-family: "Montserrat";
+}
+

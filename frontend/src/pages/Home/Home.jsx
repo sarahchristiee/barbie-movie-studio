@@ -10,6 +10,7 @@ import Carrossel from '../../components/Carrossel/Carrossel';
 // Componentes
 import LinhaAnimada from '../../components/LinhaAnimada/LinhaAnimada';
 import Filtros from '../../components/Filtros/Filtros';
+import DisplayFilme from '../../components/DisplayFilme/DisplayFilme';
 
 // Icones
 import { Film, Clapperboard, UserCheck } from "lucide-react";
@@ -103,6 +104,8 @@ export default function Home(){
                   <LinhaAnimada />
                   <h1 className='textoFilmes'>Filmes</h1>
                   <Filtros />
+
+                  <DisplayFilme/>
                 </article>
 
                 

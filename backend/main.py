@@ -3,21 +3,17 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 import pymysql
 
-# =========================
 # CONFIG DO BANCO
-# =========================
 mydb = pymysql.connect(
     host="localhost",
     user="root",
-    password="root",
+    password="senai",
     database="filmes",
     charset="utf8mb4",
     cursorclass=pymysql.cursors.DictCursor
 )
 
-# =========================
 # FUNÇÕES AUXILIARES
-# =========================
 def carregar_filmes():
     cursor = mydb.cursor()
     cursor.execute("""
@@ -102,9 +98,7 @@ def carregar_generos():
     cursor.close()
     return generos
 
-# =========================
 # HANDLER PRINCIPAL
-# =========================
 class APIHandler(BaseHTTPRequestHandler):
 
     # Função para enviar JSON
@@ -177,13 +171,11 @@ class APIHandler(BaseHTTPRequestHandler):
         novo_id = cadastrar_filme(data)
         return self._send_json({"mensagem": "Filme cadastrado com sucesso", "id_filme": novo_id}, 201)
 
-# =========================
 # SERVIDOR
-# =========================
 def main():
     server_address = ("", 8000)
     httpd = HTTPServer(server_address, APIHandler)
-    print("🚀 API rodando em http://localhost:8000")
+    print("A api ta rodando aqui ó http://localhost:8000")
     httpd.serve_forever()
 
 if __name__ == "__main__":

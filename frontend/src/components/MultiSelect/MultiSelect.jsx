@@ -7,7 +7,7 @@ export default function MultiSelect() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
 
-  // 🟢 Carrega os gêneros do backend
+  // 🔹 Pega os gêneros do backend
   useEffect(() => {
     fetch("http://localhost:8000/generos")
       .then((res) => res.json())
@@ -17,7 +17,7 @@ export default function MultiSelect() {
       .catch((err) => console.error("Erro ao carregar gêneros:", err));
   }, []);
 
-
+  // 🔹 Fecha o dropdown ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -28,6 +28,7 @@ export default function MultiSelect() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // 🔹 Seleciona ou remove um gênero
   const handleSelect = (option) => {
     if (selected.includes(option)) {
       setSelected(selected.filter((item) => item !== option));
@@ -36,6 +37,7 @@ export default function MultiSelect() {
     }
   };
 
+  // 🔹 Selecionar / desmarcar todos
   const handleSelectAll = () => {
     if (selected.length === options.length) {
       setSelected([]);
@@ -46,7 +48,11 @@ export default function MultiSelect() {
 
   return (
     <div className="multiSelect" ref={dropdownRef}>
-      <div className="selectBox" onClick={() => setOpen(!open)}>
+      {/* ⬇️ Aqui o ajuste principal */}
+      <div
+        className={`selectBox ${open ? "open" : ""}`}
+        onClick={() => setOpen(!open)}
+      >
         {selected.length > 0 ? (
           selected.map((item) => (
             <span className="tag" key={item}>
