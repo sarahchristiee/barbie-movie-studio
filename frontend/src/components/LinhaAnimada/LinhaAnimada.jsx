@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./LinhaAnimada.css";
+import '../Style/Variables.css'
 
 export default function LinhaAnimada() {
   const ref = useRef(null);

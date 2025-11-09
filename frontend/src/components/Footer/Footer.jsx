@@ -1,5 +1,6 @@
 import foto from '../../assets/imagens/footer.svg'
 import './Footer.css'
+import '../Style/Variables.css'
 
 export default function Footer(){
     return(

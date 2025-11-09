@@ -40,7 +40,8 @@
 
 .ano input::placeholder {
   opacity: 0.8;
-  font-family: "Montserrat"
+  font-family: "Montserrat";
+  color: var(--cor-placeholder);
 }
 
 /* quando clica */

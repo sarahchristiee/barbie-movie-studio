@@ -29,7 +29,7 @@ body, html {
     color: #e91e63;
     font-family: 'barbie';
     font-size: 4rem;
-    text-shadow: 2px 2px #fff;
+    text-shadow: inherit;
     margin-bottom: 30px;
 }
 
@@ -56,8 +56,8 @@ body, html {
 }
 
 .loginBox input:focus {
-    background-color: #FFAACB;
-    color: black;
+    background-color: var(--cor-focus);
+    outline: none;
 }
 
 .loginBox button {

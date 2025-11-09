@@ -164,7 +164,7 @@ p {
   height: 100vh;
   overflow: visible;
   z-index: 1;
-  bottom: 220vh;
+  bottom: 90rem;
 }
 
 .camera {
@@ -201,7 +201,7 @@ p {
 .tapete {
   position: relative;
   z-index: -1;
-  bottom: 260vh;
+  bottom: 114rem;
   width: 100%;
 }
 
@@ -209,12 +209,12 @@ p {
   position: relative;
   z-index: 0;
   width: 100%;
-  bottom: 261vh;
+  bottom: 115rem;
 }
 
 .filmes {
   position: relative;
-  bottom: 200vh;
+  bottom: 100rem;
   text-align: center;
   justify-items: center;
 }

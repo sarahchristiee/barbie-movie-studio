@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import "./MultiSelect.css";
 
-export default function MultiSelect() {
+export default function MultiSelect({ placeholder = "Filtrar por Gênero" }) { // ✅ placeholder como prop
   const [options, setOptions] = useState([]);
   const [selected, setSelected] = useState([]);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
 
-  // 🔹 Pega os gêneros do backend
+  // Pega os gêneros do backend
   useEffect(() => {
     fetch("http://localhost:8000/generos")
       .then((res) => res.json())
@@ -17,7 +17,7 @@ export default function MultiSelect() {
       .catch((err) => console.error("Erro ao carregar gêneros:", err));
   }, []);
 
-  // 🔹 Fecha o dropdown ao clicar fora
+  // Fecha o dropdown ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -28,7 +28,6 @@ export default function MultiSelect() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // 🔹 Seleciona ou remove um gênero
   const handleSelect = (option) => {
     if (selected.includes(option)) {
       setSelected(selected.filter((item) => item !== option));
@@ -37,7 +36,6 @@ export default function MultiSelect() {
     }
   };
 
-  // 🔹 Selecionar / desmarcar todos
   const handleSelectAll = () => {
     if (selected.length === options.length) {
       setSelected([]);
@@ -48,7 +46,6 @@ export default function MultiSelect() {
 
   return (
     <div className="multiSelect" ref={dropdownRef}>
-      {/* ⬇️ Aqui o ajuste principal */}
       <div
         className={`selectBox ${open ? "open" : ""}`}
         onClick={() => setOpen(!open)}
@@ -68,7 +65,7 @@ export default function MultiSelect() {
             </span>
           ))
         ) : (
-          <span className="placeholder">Filtrar por Gênero</span>
+          <span className="placeholder">{placeholder}</span> // ✅ usa a prop
         )}
         <span className="arrow">▾</span>
       </div>

@@ -17,7 +17,7 @@ import { Film, Clapperboard, UserCheck } from "lucide-react";
 import { useEffect } from "react";
 
 import './Home.css';
-
+import '../../components/Style/Variables.css'
 
 export default function Home(){
 

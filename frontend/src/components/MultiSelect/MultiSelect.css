@@ -11,6 +11,7 @@
   padding: 10px 15px;
   cursor: pointer;
   background-color: #ffffff;
+  border: 2px solid var(--cor-borda);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -21,13 +22,13 @@
 
 /* Quando o dropdown está aberto */
 .selectBox.open {
-  border-color: #821e4c;
+  border-color: var(--cor-borda);
   background-color: #fff;
 }
 
 /* Placeholder */
 .placeholder {
-  color: #9c9c9c;
+  color:  var(--cor-placeholder);
   font-family: "Montserrat", sans-serif;
 }
 

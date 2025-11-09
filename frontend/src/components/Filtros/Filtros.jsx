@@ -2,6 +2,7 @@ import AutoComplete from "../Autocomplete/Autocomplete";
 import MultiSelect from "../MultiSelect/MultiSelect";
 import { Filter } from "lucide-react";
 import './Filtros.css'
+import '../Style/Variables.css'
 
 export default function Filtros(){
 
