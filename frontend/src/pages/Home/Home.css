@@ -79,7 +79,7 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 2vw;
-  top: 60vh;
+  top: 20rem;
   z-index: 10;
   justify-content: center;
   align-items: center;
@@ -164,7 +164,7 @@ p {
   height: 100vh;
   overflow: visible;
   z-index: 1;
-  bottom: 90rem;
+  bottom: 50rem;
 }
 
 .camera {
@@ -201,7 +201,7 @@ p {
 .tapete {
   position: relative;
   z-index: -1;
-  bottom: 114rem;
+  bottom: 65rem;
   width: 100%;
 }
 
@@ -209,12 +209,12 @@ p {
   position: relative;
   z-index: 0;
   width: 100%;
-  bottom: 115rem;
+  bottom: 65.5rem;
 }
 
 .filmes {
   position: relative;
-  bottom: 100rem;
+  bottom: 55rem;
   text-align: center;
   justify-items: center;
 }
@@ -244,3 +244,4 @@ p {
   opacity: 1;
   transform: translateY(0);
 }
+ 

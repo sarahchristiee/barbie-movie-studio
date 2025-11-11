@@ -1,11 +1,3 @@
-/* Reset básico */
-body, html {
-  margin: 0;
-  height: 100%;
-  font-family: "Montserrat", sans-serif;
-}
-
-/* Container centralizado */
 .colaborarContainer {
   display: flex;
   justify-content: center;
@@ -13,9 +5,9 @@ body, html {
   min-height: 100vh;
   padding: 20px;
   box-sizing: border-box;
+  margin-top: 5vh;
 }
 
-/* Caixa do formulário */
 .colaborarBox {
   background-color: #fff;
   width: 90%;
@@ -28,26 +20,37 @@ body, html {
   align-items: center;
 }
 
-/* Título */
 .colaborarTitle {
   text-align: center;
   color: #e91e63;
   font-family: 'barbie', sans-serif;
   text-shadow: 2px 2px #fff;
   margin-bottom: 30px;
-  font-size: 2.5rem;
+  font-size: 4rem;
 }
 
-/* Formulário flexível */
+
 .colaborarForm {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+
+label{
+  text-align: left;
+}
+
+.inputsWrapper {
+  display: flex;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: wrap; 
   gap: 20px;
   width: 100%;
 }
 
-/* Colunas do formulário */
 .ladoUm, .ladoDois {
   flex: 1;
   min-width: 300px;
@@ -56,19 +59,21 @@ body, html {
   gap: 15px;
 }
 
-/* Labels */
-.colaborarBox label {
-  color: #e91e63;
-  margin-bottom: 5px;
-  display: block;
+.submitWrapper {
+  width: 100%;
 }
 
-/* Inputs */
+.colaborarBox label {
+  color: #e91e63;
+  display: block;
+  font-family: "Lilita One", sans-serif;
+}
+
 .colaborarForm input {
   border-radius: 50px;
   height: 40px;
   padding: 10px 15px;
-  border: 2px solid var(--cor-borda, #ccc);
+  border: 2px solid var(--cor-borda);
   font-size: 1rem;
   box-sizing: border-box;
   transition: all 0.3s ease;
@@ -81,15 +86,47 @@ body, html {
   width: 100%;
 }
 
+.colaborarForm input:focus{
+    background-color: var(--cor-focus);
+    outline: none;
+}
+
+.colaborarForm textarea:focus{
+    outline: none;
+}
+
+input::placeholder {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
 .ladoUm, .ladoDois {
   flex: 1;
   min-width: 300px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 2vh;
 }
 
-/* Botão sempre abaixo das colunas */
+textarea{
+  overflow-y: auto;
+  resize: none;
+  border-radius: 20px;
+  padding: 10px;
+  border: 2px solid var(--cor-borda);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+input:focus::placeholder{
+  opacity: 0;
+} 
+
+textarea:focus::placeholder{
+  opacity: 0;
+}
+
 .submitContainer {
   width: 100%;
   display: flex;
@@ -113,39 +150,11 @@ body, html {
   background-color: #c2185b;
 }
 
-
-/* Mensagem de feedback */
 .mensagem {
   margin-top: 15px;
   text-align: center;
   color: #e91e63;
   font-weight: bold;
   font-size: 1rem;
-}
-
-/* Responsividade tablets */
-@media (max-width: 700px) {
-  .colaborarForm {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .ladoUm, .ladoDois {
-    width: 100%;
-    min-width: unset;
-  }
-
-  .colaborarBox {
-    width: 100%;
-    padding: 20px;
-  }
-
-  .colaborarTitle {
-    font-size: 2rem;
-  }
-
-  .submitButton {
-    width: 80%;
-  }
 }
 

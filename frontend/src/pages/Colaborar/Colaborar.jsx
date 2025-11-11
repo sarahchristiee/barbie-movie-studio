@@ -50,46 +50,62 @@ export default function Colaborar() {
     }
   };
 
-  return (
-    <div className="colaborarContainer">
-      <div className="colaborarBox">
-        <h2 className="colaborarTitle">Cadastrar Filme</h2>
+// ... (código anterior)
 
-        <form className="colaborarForm" onSubmit={handleSubmit}>
-          <div className="ladoUm">
-            <label>Título</label>
-            <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} required />
+  return (
+    <div className="colaborarContainer">
+      <div className="colaborarBox">
+        <h2 className="colaborarTitle">Cadastrar Filme</h2>
 
-            <label>Orçamento</label>
-            <input type="number" value={orcamento} onChange={e => setOrcamento(e.target.value)} />
+        <form className="colaborarForm" onSubmit={handleSubmit}>
+          
+          <div className="inputsWrapper"> 
+            <div className="ladoUm">
+              <label>Título</label>
+              <input type="text" placeholder="Título do filme" value={titulo} onChange={e => setTitulo(e.target.value)} required />
 
-            <label>Duração (em minutos)</label>
-            <input type="text" value={duracao} onChange={e => setDuracao(e.target.value)} />
+              <label>Diretor</label>
+              <input type="text" placeholder="Quem dirigiu o filme" value={titulo} onChange={e => setTitulo(e.target.value)} required />
 
-            <label>Ano</label>
-            <input type="number" value={ano} onChange={e => setAno(e.target.value)} />
-          </div>
+              <label>Orçamento</label>
+              <input type="number" placeholder="Orçamento" value={orcamento} onChange={e => setOrcamento(e.target.value)} />
 
-          <div className="ladoDois">
-            <label>Link do Poster</label>
-            <input type="text" value={poster} onChange={e => setPoster(e.target.value)} />
+              <label>Duração</label>
+              <input type="text" placeholder="Formato HH:MM:SS (Ex: 01:54:00)" value={duracao} onChange={e => setDuracao(e.target.value)} />
 
-            <label>Link do Trailer</label>
-            <input type="text" value={trailer} onChange={e => setTrailer(e.target.value)} />
+              <label>Ano</label>
+              <input type="number" placeholder="Ano de lançamento" value={ano} onChange={e => setAno(e.target.value)} />
+            </div>
 
-            <label>Gêneros</label>
-            <MultiSelect 
-              placeholder="Escolha os gêneros" 
-              selected={generosSelecionados} 
-              setSelected={setGenerosSelecionados} 
-            />
-          </div>
+            <div className="ladoDois">
+              <label>Produtora</label>
+              <input type="text" placeholder="Empresa que produziu o filme" value={titulo} onChange={e => setTitulo(e.target.value)} required />
 
-          <button type="submit">Cadastrar Filme</button>
+              <label>Link do Poster</label>
+              <input type="text" placeholder="URL do poster (Ex: https://image.tmdb.org/...)" value={poster} onChange={e => setPoster(e.target.value)} />
 
-          {mensagem && <p className="mensagem">{mensagem}</p>}
-        </form>
-      </div>
-    </div>
-  );
+              <label>Link do Trailer</label>
+              <input type="text" placeholder="URL do YouTube ou Vimeo (Ex: youtube.com/watch?v=...)" value={trailer} onChange={e => setTrailer(e.target.value)} />
+
+              <label>Gêneros</label>
+              <MultiSelect 
+                placeholder="Defina os gêneros" 
+                selected={generosSelecionados} 
+                setSelected={setGenerosSelecionados} 
+              />
+
+              <label>Sinopse</label>
+              <textarea placeholder="Resumo do filme" name="" id=""></textarea>
+            </div>
+          </div>
+          
+          <div className="submitWrapper">
+            <button className="submitButton" type="submit">Cadastrar Filme</button>
+          </div>
+
+          {mensagem && <p className="mensagem">{mensagem}</p>}
+        </form>
+      </div>
+    </div>
+  );
 }

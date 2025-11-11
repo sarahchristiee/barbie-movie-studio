@@ -1,14 +1,9 @@
-body, html {
-    margin: 0;
-    height: 100%;
-    font-family: "Montserrat", sans-serif;
-}
-
 .loginContainer {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin-top: 2rem;
 }
 
 .loginBox {
@@ -17,7 +12,7 @@ body, html {
     height: 420px; 
     border-radius: 20px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    padding: 0px 0px 20px 0px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -28,9 +23,9 @@ body, html {
     text-align: center;
     color: #e91e63;
     font-family: 'barbie';
-    font-size: 4rem;
+    font-size: 4.5rem;
     text-shadow: inherit;
-    margin-bottom: 30px;
+    margin-bottom: 2rem;
 }
 
 .loginBox label {
