@@ -1,4 +1,4 @@
-// Imagens
+// Código do componente Home.jsx (Mantido, sem grandes alterações de estrutura)
 import cameraClaquete from '../../assets/imagens/cameraClaquete.svg';
 import cadeiraHolofote from "../../assets/imagens/cadeiraHolofote.svg";
 import tapete from '../../assets/imagens/tapete.svg';
@@ -36,16 +36,26 @@ export default function Home() {
 
   return (
     <>
-      <article className="textoInicial scroll-reveal">
-        <h1>Barbie Movie Studio</h1>
-        <h2>Bem-vinda ao Barbie Movie Studio</h2>
-        <p>
-          Aqui você encontra todos os filmes da Barbie! Explore nossos destaques
-          ou envie um filme para participar do nosso catálogo!
-        </p>
-        <a href="#explorar" className="explorar">Explorar Filmes</a>
-      </article>
+      {/* Container principal para o topo rosa. Envolva tudo que fica no fundo rosa escuro */}
+      <div className="main-header-content"> 
+        <article className="textoInicial scroll-reveal">
+          <h1>Barbie Movie Studio</h1>
+          <h2></h2>
+          <p>
+            Aqui você encontra todos os filmes da Barbie! Explore nossos destaques
+            ou envie um filme para participar do nosso catálogo!
+          </p>
+          <a href="#explorar" className="explorar">Explorar Filmes</a>
+        </article>
 
+        {/* --- Imagens decorativas (posicionadas atrás do texto) --- */}
+        <div className="imagens">
+          <img src={cameraClaquete} alt="Câmera e claquete rosa" className="cameraClaquete" />
+          <img src={cadeiraHolofote} alt="Cadeira e holofote de estúdio" className="cadeiraHolofote" />
+        </div>
+      </div>
+
+      {/* Cards - Posicionados logo abaixo do topo, mas sobrepondo um pouco */}
       <section className="cards scroll-reveal">
         <article>
           <Film size={40} className="icon" />
@@ -66,17 +76,12 @@ export default function Home() {
         </article>
       </section>
 
+      {/* Destaques - Começa onde a seção de cards termina */}
       <section className="destaques scroll-reveal">
         <h1>Destaques</h1>
         <LinhaAnimada />
         <Carrossel />
       </section>
-
-      {/* --- Imagens decorativas --- */}
-      <div className="imagens">
-        <img src={cameraClaquete} alt="Câmera e claquete rosa" className="cameraClaquete" />
-        <img src={cadeiraHolofote} alt="Cadeira e holofote de estúdio" className="cadeiraHolofote" />
-      </div>
 
       <img src={tapete} alt="Tapete rosa" className="tapete" />
 

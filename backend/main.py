@@ -7,13 +7,12 @@ import pymysql
 mydb = pymysql.connect(
     host="localhost",
     user="root",
-    password="root",
+    password="senai",
     database="filmes",
     charset="utf8mb4",
     cursorclass=pymysql.cursors.DictCursor
 )
 
-# ---------------- FUNÇÕES AUXILIARES ----------------
 
 def carregar_filmes():
     cursor = mydb.cursor()

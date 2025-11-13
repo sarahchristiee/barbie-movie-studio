@@ -1,9 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
 
+/* Variável para o tom de rosa escuro do topo */
+:root {
+  --barbie-pink-dark: #DF1683;
+  --barbie-pink-light: #f9c3dc;
+  --barbie-red: #EB3A58;
+}
+
 body {
   margin: 0;
-  background-color: #f9c3dc;
+  /* O fundo principal da página é o rosa claro */
+  background-color: var(--barbie-pink-light);
 }
 
 @font-face {
@@ -11,32 +19,49 @@ body {
   src: url('../../assets/fontes/Barbie.ttf') format('truetype');
 }
 
+/* --- Container do Topo (Fundo Rosa Escuro) --- */
+.main-header-content {
+  position: relative;
+  /* Cor de fundo principal do topo (Barbie Red/Escuro) */
+  background-color: var(--barbie-red);
+  /* Altura que cobre o texto e as imagens */
+  height: 60vh; 
+  min-height: 450px; /* Garante um tamanho mínimo em telas muito pequenas */
+  padding-bottom: 5rem; /* Espaçamento inferior para a seção de cards se sobrepor */
+  overflow: hidden; /* Para garantir que elementos absolutos não causem scroll indesejado */
+}
+
 /* --- Texto inicial --- */
 .textoInicial {
   position: relative;
   z-index: 10;
-  top: 25vh;
+  top: 5vh; /* Ajuste para não ficar tão em cima */
   color: white;
   text-align: center;
+  /* Centraliza o conteúdo horizontalmente */
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 h1 {
-  font-size: clamp(2.5rem, 8vw, 9rem);
+  font-size: clamp(2.5rem, 8vw, 6rem); /* Reduzido o máximo para 6rem */
   font-family: 'Barbie';
-  text-shadow: 2px 2px 4px #DF1683;
+  text-shadow: 2px 2px 4px var(--barbie-pink-dark);
+  margin-bottom: 0.5rem;
 }
 
 h2 {
   font-family: "Lilita One";
-  font-size: clamp(1.2rem, 3vw, 3rem);
-  text-shadow: 2px 2px 4px #DF1683;
+  font-size: clamp(1.2rem, 3vw, 2rem); /* Reduzido o máximo para 2rem */
+  text-shadow: 2px 2px 4px var(--barbie-pink-dark);
+  margin-top: 0;
 }
 
 p {
   text-align: center;
-  margin: 0 auto 6vh;
-  font-size: clamp(1rem, 2vw, 2rem);
-  width: min(60%, 60ch);
+  margin: 0 auto 3vh; /* Reduzido a margem inferior */
+  font-size: clamp(1rem, 2vw, 1.2rem); /* Reduzido o máximo para 1.2rem */
+  width: min(80%, 60ch);
   font-family: "Montserrat";
   line-height: 1.8;
 }
@@ -44,116 +69,138 @@ p {
 .explorar {
   color: white;
   display: inline-block;
-  background-color: #EB3A58;
-  padding: 1.5rem 2.5rem;
+  background-color: var(--barbie-pink-dark); /* Cor do botão */
+  padding: 1rem 2rem; /* Ajustado o padding */
   text-align: center;
+  text-decoration: none; /* Adicionado para links */
   border: transparent 0.25rem solid;
   transition: transform 0.3s ease;
   font-size: clamp(1rem, 1.5vw, 1.2rem);
+  font-family: "Lilita One"; /* Usando uma fonte estilizada */
+  border-radius: 0.5rem; /* Borda levemente arredondada */
 }
 .explorar:hover {
-  transform: scale(1.1);
+  transform: scale(1.05); /* Reduzido o scale */
   border: white 0.25rem solid;
+}
+
+/* --- Imagens de Fundo --- */
+.imagens {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin-top: 20vh;
+  z-index: 1; /* Fica atrás do texto (textoInicial z-index: 10) */
+  pointer-events: none; /* Para não interferir no clique do botão */
+}
+
+.cameraClaquete {
+  position: absolute;
+  width: 25%; /* Usando porcentagem para responsividade */
+  left: 3%;
+  bottom: 5%; /* Posiciona no fundo da área vermelha */
+  max-width: 500px;
+}
+
+.cadeiraHolofote {
+  position: absolute;
+  width: 25%;
+  right: 3%;
+  bottom: 5%;
+  max-width: 500px;
 }
 
 /* --- Cards --- */
 .cards {
   position: relative;
+  /* Move os cards para cima para sobrepor a margem inferior do main-header-content */
+  margin-top: -5rem; 
   display: flex;
   flex-wrap: wrap;
-  gap: 2vw;
-  top: 50rem;
+  gap: 1.5rem; /* Ajustado o gap */
   justify-content: center;
   text-align: center;
-  z-index: 10;
+  z-index: 10; /* Fica sobre o topo rosa escuro */
+  padding: 0 1rem;
 }
 
 .cards article {
   background-color: white;
-  padding: 0.8rem;
+  padding: 1rem;
   border-radius: 1rem;
-  width: clamp(250px, 25vw, 550px);
-  height: clamp(260px, 30vh, 400px);
-  transition: transform 0.3s ease;
+  /* Usando flex-basis para controle de largura flexível */
+  flex-basis: clamp(250px, 28%, 400px); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Altura controlada pelo conteúdo, min-height para igualar */
+  min-height: 250px; 
 }
 .cards article:hover {
-  transform: scale(1.08);
+  transform: translateY(-5px); /* Efeito de elevação leve */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 .cards h3 {
   font-family: "Lilita One";
-  color: #DF1683;
-  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  color: var(--barbie-pink-dark);
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  margin-top: 0.5rem;
 }
 .cards p {
-  font-size: clamp(1rem, 1.8vw, 1.5rem);
-  width: min(90%, 40ch);
+  font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+  width: auto;
+  margin: 0 auto;
 }
 .icon {
-  color: #DF1683;
+  color: var(--barbie-pink-dark);
+  margin-top: 1rem;
 }
 
 /* --- Destaques --- */
 .destaques {
   position: relative;
   text-align: center;
-  top: 130vh;
+  padding-top: 5rem; /* Espaço após os cards */
+  padding-bottom: 2rem;
   z-index: 20;
 }
 
 .destaques h1{
   color: white;
-  text-shadow: inherit;
+  text-shadow: 2px 2px 4px var(--barbie-pink-dark); /* Adiciona sombra escura */
+  margin-bottom: 0.5rem;
 }
 
-/* --- Imagens de Fundo --- */
-.imagens {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  z-index: 1;
-  bottom: 70rem;
-}
-
-.cameraClaquete {
-  position: absolute;
-  width: 28%;
-  left: 2%;
-  bottom: 20%;
-  max-width: 540px;
-}
-
-.cadeiraHolofote {
-  position: absolute;
-  width: 28%;
-  right: 2%;
-  bottom: 18%;
-  max-width: 540px;
-}
-
+/* --- Tapete --- */
 .tapete {
   position: relative;
   width: 100%;
-  bottom: 92rem;
-  z-index: -1;
+  margin-top: -3rem; 
+  z-index: 5;
+  display: block;
 }
 
-/* --- Filmes --- */
+/* --- Filmes (Catálogo) --- */
 .filmes {
   position: relative;
-  bottom: 90rem;
-  text-align: center;
+  margin-top: -10rem; 
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+  background-color: transparent;
+  z-index: 20;
 }
 #explorar {
   position: relative;
-  top: 10vh;
   color: white;
+  text-shadow: 2px 2px 4px #DF1683;
+  top: 0;
 }
 .textoFilmes {
-  color: #DF1683;
+  color: var(--barbie-pink-dark);
   text-shadow: 2px 2px 4px #df16858f;
-  position: relative;
-  top: -10vh;
+  margin-top: -3rem;
 }
 
 /* --- Animação Scroll --- */
@@ -168,27 +215,58 @@ p {
 }
 
 /* --- Responsividade --- */
-@media (max-width: 1280px) {
-  .imagens {
-    height: 80vh;
+@media (max-width: 1024px) {
+  .main-header-content {
+    height: 50vh;
+    min-height: 400px;
   }
   .cameraClaquete,
   .cadeiraHolofote {
-    width: 35%;
-    bottom: 10%;
+    width: 30%;
   }
 }
 
 @media (max-width: 768px) {
-  .imagens {
-    height: 60vh;
+  .main-header-content {
+    height: 45vh;
+    min-height: 350px;
+  }
+  .cameraClaquete,
+  .cadeiraHolofote {
+    width: 35%;
+    bottom: 0;
+  }
+  .cards {
+    margin-top: -3rem; /* Menos sobreposição em telas menores */
+    gap: 1rem;
+  }
+  .cards article {
+    flex-basis: 45%; /* Dois cards por linha */
+  }
+  .tapete {
+    margin-top: 0;
+  }
+  .filmes {
+    margin-top: -5rem; /* Menos margem para o catálogo */
+  }
+}
+
+@media (max-width: 480px) {
+  .main-header-content {
+    height: 40vh;
+    min-height: 300px;
   }
   .cameraClaquete,
   .cadeiraHolofote {
     width: 45%;
-    bottom: 5%;
+    /* Pode ocultar em telas muito pequenas se as imagens atrapalharem */
+    /* display: none; */ 
+  }
+  .cards article {
+    flex-basis: 90%; /* Um card por linha */
+    min-height: 150px;
   }
   .cards {
-    top: 25rem;
+    gap: 1.5rem;
   }
 }
