@@ -3,6 +3,8 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 10vh;
   padding: 20px;
+  margin-left: 12vh;
+  
 }
 
 .DisplayFilme {
