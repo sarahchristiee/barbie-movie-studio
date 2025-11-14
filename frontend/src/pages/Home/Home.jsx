@@ -9,14 +9,14 @@ import Carrossel from '../../components/Carrossel/Carrossel';
 
 // Ícones
 import { Film, Clapperboard, UserCheck } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import './Home.css';
-import '../../components/Style/Variables.css'
+import '../../components/Style/Variables.css';
 
 export default function Home() {
 
-  // Animação scroll
+  // ==================== ANIMAÇÃO DE SCROLL ====================
   useEffect(() => {
     const elements = document.querySelectorAll(".scroll-reveal");
     const observer = new IntersectionObserver((entries) => {
@@ -31,6 +31,49 @@ export default function Home() {
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, []);
+
+  // ==================== ESTADOS ====================
+  const [filmes, setFilmes] = useState([]);
+  const [filmesFiltrados, setFilmesFiltrados] = useState([]);
+
+  const [tituloFiltro, setTituloFiltro] = useState("");
+  const [generosFiltro, setGenerosFiltro] = useState([]);
+  const [anoFiltro, setAnoFiltro] = useState("");
+
+  // ==================== BUSCAR FILMES DO BACKEND ====================
+  function carregarFilmes() {
+    let url = "http://localhost:8000/filmes";
+
+    const params = new URLSearchParams();
+
+    if (tituloFiltro.trim() !== "") params.append("titulo", tituloFiltro);
+    if (generosFiltro.length === 1) params.append("genero", generosFiltro[0]);
+
+    if ([...params].length > 0) url += "?" + params.toString();
+
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
+        setFilmes(data);
+      })
+      .catch(err => console.log("Erro ao carregar filmes:", err));
+  }
+
+  // Recarregar quando filtros do backend mudarem
+  useEffect(() => {
+    carregarFilmes();
+  }, [tituloFiltro, generosFiltro]);
+
+  // ==================== FILTRO DO ANO (FRONTEND) ====================
+  useEffect(() => {
+    if (!anoFiltro) {
+      setFilmesFiltrados(filmes);
+    } else {
+      setFilmesFiltrados(
+        filmes.filter(f => String(f.ano) === String(anoFiltro))
+      );
+    }
+  }, [anoFiltro, filmes]);
 
   return (
     <>
@@ -65,21 +108,31 @@ export default function Home() {
       </section>
 
       <div className="imagens">
-        <img src={imgFundo} alt="imagem de objetos de cinema seguido por um tapete vermelho"/>
+        <img 
+          src={imgFundo} 
+          alt="imagem de objetos de cinema seguido por um tapete vermelho"
+        />
       </div>
 
       <section className="destaques scroll-reveal">
-        <h1 >Destaques</h1>
+        <h1>Destaques</h1>
         <LinhaAnimada className='linhaAnimada' />
         <Carrossel />
       </section>
 
-
       <article className="filmes">
         <h1 id='explorar'>Filmes</h1>
         <LinhaAnimada className='linhaAnimada' />
-        <Filtros className='filtros' />
-        <DisplayFilme />
+
+        {/* Filtros 100% funcionais */}
+        <Filtros
+          onFilterTitulo={setTituloFiltro}
+          onFilterGenero={setGenerosFiltro}
+          onFilterAno={setAnoFiltro}
+        />
+
+        {/* Lista final de filmes filtrados */}
+        <DisplayFilme filmes={filmesFiltrados} />
       </article>
     </>
   );

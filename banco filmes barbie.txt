@@ -160,18 +160,18 @@ INSERT INTO sinopse (id_filme, descricao) VALUES
 -- POSTERS
 -- =========================
 INSERT INTO poster (id_filme, link_poster) VALUES
-(1, 'https://static.wikia.nocookie.net/vozesportuguesas/images/e/e0/1-Barbie-CVP.jpg'),
-(2, 'https://m.media-amazon.com/images/I/71Zvj1rP2FL._AC_UF894,1000_QL80_.jpg'),
-(3, 'https://m.media-amazon.com/images/I/81BSMZqCJ3L._AC_UF894,1000_QL80_.jpg'),
+(1, 'https://m.media-amazon.com/images/M/MV5BZTE0OWE5ZTctM2U2YS00MWQyLWFkODAtMjI3Mzg0MWY3ZmQ5XkEyXkFqcGc@._V1_FMjpg_UX550_.jpg'),
+(2, 'https://m.media-amazon.com/images/M/MV5BNGQ4NDU3ZTQtMjVlYy00ZjNiLWI4NGYtODVkZDQ5MzJhMGRiXkEyXkFqcGc@._V1_FMjpg_UX550_.jpg'),
+(3, 'https://m.media-amazon.com/images/M/MV5BYTg3NmEzM2EtMzQ4ZS00YzQwLTk5ZWUtOWFlZjU3NWFjYzdkXkEyXkFqcGc@._V1_FMjpg_UX550_.jpg'),
 (4, 'https://upload.wikimedia.org/wikipedia/pt/thumb/7/70/Barbie_as_the_Princess_and_the_Pauper_poster.jpg/250px-Barbie_as_the_Princess_and_the_Pauper_poster.jpg'),
 (5, 'https://upload.wikimedia.org/wikipedia/pt/9/90/Barbie_Fairytopia.jpg'),
 (6, 'https://upload.wikimedia.org/wikipedia/pt/0/04/Barbie_and_the_Magic_of_Pegasus.png'),
-(7, 'https://upload.wikimedia.org/wikipedia/pt/d/d9/Barbie_Diamond_Castle_poster.jpg'),
-(8, 'https://upload.wikimedia.org/wikipedia/pt/7/7a/Barbie_and_the_Three_Musketeers.jpg'),
-(9, 'https://upload.wikimedia.org/wikipedia/pt/0/0c/Barbie_Princess_School_poster.jpg'),
-(10, 'https://upload.wikimedia.org/wikipedia/pt/a/a1/Barbie_The_Princess_and_the_Popstar_poster.jpg'),
-(11, 'https://upload.wikimedia.org/wikipedia/pt/0/0b/Barbie_Pearl_Princess_poster.jpg'),
-(12, 'https://upload.wikimedia.org/wikipedia/pt/f/f8/Barbie_2023_poster.jpg');
+(7, 'https://m.media-amazon.com/images/M/MV5BMjA1MDgwNDk2OV5BMl5BanBnXkFtZTgwMTM4MjA2MDE@._V1_FMjpg_UX358_.jpg'),
+(8, 'https://m.media-amazon.com/images/M/MV5BYWQ4MjVhZmYtZGM2OS00Yjg1LWJlZWUtZjUwYzliMzI1M2ZiXkEyXkFqcGc@._V1_FMjpg_UX550_.jpg'),
+(9, 'https://m.media-amazon.com/images/M/MV5BMmM5MjNjNzUtZDdlMC00MDU4LWE3MjEtN2EyYWU4ZWUxZTgyXkEyXkFqcGc@._V1_FMjpg_UX550_.jpg'),
+(10, 'https://m.media-amazon.com/images/M/MV5BYzVhMDI4YjgtY2I2MC00MmJhLWE1NDktMzk5ZWYyOTM1OTI3XkEyXkFqcGc@._V1_FMjpg_UX550_.jpg'),
+(11, 'https://m.media-amazon.com/images/M/MV5BZjQzZjYwNjMtMTZkYi00ZmYzLWI1NjAtNzkxMTlmYzYwNzUwXkEyXkFqcGc@._V1_FMjpg_UX550_.jpg'),
+(12, 'https://m.media-amazon.com/images/M/MV5BZjA4NmQwNmItMGMwNy00NjgxLThlMDQtYzQ5ODRhOGI3MTFhXkEyXkFqcGc@._V1_FMjpg_UY4096_.jpg');
 
 -- =========================
 -- TRAILERS
@@ -184,10 +184,10 @@ INSERT INTO trailer (id_filme, link_trailer) VALUES
 (5, 'https://www.youtube.com/watch?v=pITEecVKOeE'),
 (6, 'https://www.youtube.com/watch?v=ztb9hxl9yXA'),
 (7, 'https://www.youtube.com/watch?v=0NBV0HnFrL0'),
-(8, 'https://www.youtube.com/watch?v=jiyLYwYcY1E'),
-(9, 'https://www.youtube.com/watch?v=2q6JKXq8F9o'),
-(10, 'https://www.youtube.com/watch?v=TVuzh6En97c'),
-(11, 'https://www.youtube.com/watch?v=4_1dJdFzLRA'),
+(8, 'https://www.youtube.com/watch?v=-vZcFp5eB94'),
+(9, 'https://www.youtube.com/watch?v=dgjKoFMB2rk'),
+(10, 'https://www.youtube.com/watch?v=MMSxXvrxvV0'),
+(11, 'https://www.youtube.com/watch?v=rjmJkAnyZvs'),
 (12, 'https://www.youtube.com/watch?v=pBk4NYhWNMM');
 
 -- =========================

@@ -51,7 +51,6 @@
 }
 
 .loginBox input:focus {
-    background-color: var(--cor-focus);
     outline: none;
 }
 

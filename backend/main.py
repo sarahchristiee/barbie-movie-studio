@@ -7,24 +7,29 @@ import pymysql
 mydb = pymysql.connect(
     host="localhost",
     user="root",
-    password="root",
+    password="senai",
     database="filmes",
     charset="utf8mb4",
     cursorclass=pymysql.cursors.DictCursor
 )
-
-# ---------------- FUNÇÕES AUXILIARES ----------------
 
 def carregar_filmes():
     cursor = mydb.cursor()
     try:
         cursor.execute("""
             SELECT 
-                f.id_filme, f.titulo, f.orcamento, f.tempo_duracao, f.ano,
-                p.link_poster, t.link_trailer
+                f.id_filme, 
+                f.titulo, 
+                f.orcamento, 
+                f.tempo_duracao, 
+                f.ano,
+                p.link_poster, 
+                t.link_trailer,
+                s.descricao AS sinopse
             FROM filme f
             LEFT JOIN poster p ON f.id_filme = p.id_filme
             LEFT JOIN trailer t ON f.id_filme = t.id_filme
+            LEFT JOIN sinopse s ON f.id_filme = s.id_filme
             ORDER BY f.id_filme ASC
         """)
         result = cursor.fetchall()
@@ -36,11 +41,13 @@ def carregar_filmes():
                 "tempo_duracao": str(row["tempo_duracao"]),
                 "ano": row["ano"],
                 "poster": row["link_poster"],
-                "trailer": row["link_trailer"]
+                "trailer": row["link_trailer"],
+                "sinopse": row["sinopse"]
             } for row in result
         ]
     finally:
         cursor.close()
+
 
 def carregar_filme_por_id(id_filme):
     cursor = mydb.cursor()
@@ -48,8 +55,10 @@ def carregar_filme_por_id(id_filme):
         cursor.execute("""
             SELECT 
                 f.id_filme, f.titulo, f.orcamento, f.tempo_duracao, f.ano,
+                s.descricao AS sinopse,
                 p.link_poster, t.link_trailer
             FROM filme f
+            LEFT JOIN sinopse s ON f.id_filme = s.id_filme
             LEFT JOIN poster p ON f.id_filme = p.id_filme
             LEFT JOIN trailer t ON f.id_filme = t.id_filme
             WHERE f.id_filme = %s
@@ -63,11 +72,13 @@ def carregar_filme_por_id(id_filme):
             "orcamento": row["orcamento"],
             "tempo_duracao": str(row["tempo_duracao"]),
             "ano": row["ano"],
+            "sinopse": row["sinopse"],
             "poster": row["link_poster"],
             "trailer": row["link_trailer"]
         }
     finally:
         cursor.close()
+
 
 def carregar_generos():
     cursor = mydb.cursor()
@@ -76,6 +87,7 @@ def carregar_generos():
         return [{"id": row["id_genero"], "nome": row["nome_genero"]} for row in cursor.fetchall()]
     finally:
         cursor.close()
+
 
 def cadastrar_filme(data):
     cursor = mydb.cursor()
@@ -99,7 +111,14 @@ def cadastrar_filme(data):
                 (id_filme, data["trailer"])
             )
 
-        # Inserir gêneros (data["generos"] é uma lista de nomes)
+        # Inserir sinopse
+        if data.get("sinopse"):
+            cursor.execute(
+                "INSERT INTO sinopse (id_filme, descricao) VALUES (%s, %s)",
+                (id_filme, data["sinopse"])
+            )
+
+        # Inserir gêneros
         if data.get("generos"):
             for nome_genero in data["generos"]:
                 cursor.execute(
@@ -121,11 +140,11 @@ def cadastrar_filme(data):
     finally:
         cursor.close()
 
-# ---------------- HANDLER PRINCIPAL ----------------
+
+# HANDLER
 
 class APIHandler(BaseHTTPRequestHandler):
 
-    # Enviar JSON
     def _send_json(self, data, status=200):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -133,11 +152,9 @@ class APIHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
 
-    # Enviar erro
     def _send_error(self, message, code=400):
         self._send_json({"error": message}, code)
 
-    # CORS
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -145,32 +162,47 @@ class APIHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
-    # GET
     def do_GET(self):
         parsed = urlparse(self.path)
         path_parts = parsed.path.strip("/").split("/")
+        query = dict(qc.split("=") for qc in parsed.query.split("&") if "=" in qc)
 
-        if self.path == "/filmes":
-            return self._send_json(carregar_filmes())
+        # FILTRAR
+        if path_parts[0] == "filmes" and len(path_parts) == 1:
 
-        elif len(path_parts) == 2 and path_parts[0] == "filmes":
-            try:
-                id_filme = int(path_parts[1])
-                filme = carregar_filme_por_id(id_filme)
-                if filme:
-                    return self._send_json(filme)
-                else:
-                    return self._send_error("Filme não encontrado", 404)
-            except ValueError:
-                return self._send_error("ID inválido", 400)
+            filmes = carregar_filmes()
 
+            # FILTRAR POR TÍTULO
+            if "titulo" in query:
+                titulo = query["titulo"].lower()
+                filmes = [f for f in filmes if titulo in f["titulo"].lower()]
+
+            # FILTRAR POR GÊNERO
+            if "genero" in query:
+                genero = query["genero"].lower()
+
+                cursor = mydb.cursor()
+                cursor.execute("""
+                    SELECT fg.id_filme FROM filme_genero fg
+                    JOIN genero g ON fg.id_genero = g.id_genero
+                    WHERE LOWER(g.nome_genero) = %s
+                """, (genero,))
+                ids = {row["id_filme"] for row in cursor.fetchall()}
+                cursor.close()
+
+                filmes = [f for f in filmes if f["id_filme"] in ids]
+
+            return self._send_json(filmes)
+
+        # GÊNEROS 
         elif self.path == "/generos":
             return self._send_json(carregar_generos())
+        
 
+        
         else:
             return self._send_error("Rota não encontrada", 404)
 
-    # POST
     def do_POST(self):
         if self.path != "/filmes":
             return self._send_error("Rota não encontrada", 404)
@@ -191,6 +223,7 @@ class APIHandler(BaseHTTPRequestHandler):
             return self._send_json({"mensagem": "Filme cadastrado com sucesso", "id_filme": novo_id}, 201)
         except Exception as e:
             return self._send_error(f"Erro ao cadastrar filme: {str(e)}", 500)
+
 
 # ---------------- SERVIDOR ----------------
 

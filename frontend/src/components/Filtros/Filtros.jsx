@@ -1,23 +1,28 @@
-import AutoComplete from "../Autocomplete/Autocomplete";
+import AutoComplete from "../AutoComplete/AutoComplete";
 import MultiSelect from "../MultiSelect/MultiSelect";
-import { Filter } from "lucide-react";
-import './Filtros.css'
-import '../Style/Variables.css'
+import "./Filtros.css";
 
-export default function Filtros(){
+export default function Filtros({ onFilterTitulo, onFilterGenero, onFilterAno }) {
+  return (
+    <section className="filtros">
+      
+      {/* FILTRO POR TÍTULO */}
+      <AutoComplete onFilterTitulo={onFilterTitulo} />
 
-    return(
-        <section className="filtros">
-          <div className="pesquisaTexto">
-            <Filter size={30} className="filterIcon" />
-            <AutoComplete className="AutoComplete"/>
-          </div>
-        
-        <MultiSelect />
-        <div className="ano">
-          <input type="number" name="" id="" placeholder="Filtrar por Ano" min={1987} max={2023} />  
-        </div>
-        </section>
-        
-    );
-};
+      {/* FILTRO POR GÊNERO */}
+      <MultiSelect onFilterGenero={onFilterGenero} />
+
+      {/* FILTRO POR ANO */}
+      <div className="ano">
+        <input
+          type="number"
+          placeholder="Filtrar por Ano"
+          min={1980}
+          max={2025}
+          onChange={(e) => onFilterAno(e.target.value)}
+        />
+      </div>
+
+    </section>
+  );
+}
