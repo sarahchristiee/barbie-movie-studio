@@ -18,10 +18,8 @@ export default function DisplayFilme() {
   return (
     <div className="DisplayFilmeContainer">
       {filmes.map((filme) => (
-        // 2. Substituir a div por <Link> e definir o caminho (path) com o ID
-        // Isso fará o redirecionamento para PaginaFilme (assumindo que a rota está configurada)
         <Link 
-          to={`/filme/${filme.id_filme}`} // O caminho deve ser `/filme/1`, `/filme/2`, etc.
+          to={`/PaginaFilme/${filme.id_filme}`}
           className="DisplayFilme" 
           key={filme.id_filme}
         >

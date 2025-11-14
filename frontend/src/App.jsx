@@ -17,7 +17,7 @@ function App() {
         <Route path="/Home" element={<Home />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Colaborar" element={<Colaborar />} />
-        <Route path="/PaginaFilme" element={<PaginaFilme />} />
+        <Route path="/PaginaFilme/:id_filme" element={<PaginaFilme />} />
       </Routes>
 
       <Footer />

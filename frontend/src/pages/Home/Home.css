@@ -62,7 +62,7 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 2vw;
-  top: 50rem;
+  top: 35rem;
   justify-content: center;
   text-align: center;
   z-index: 10;
@@ -72,8 +72,8 @@ p {
   background-color: white;
   padding: 0.8rem;
   border-radius: 1rem;
-  width: clamp(250px, 25vw, 550px);
-  height: clamp(260px, 30vh, 400px);
+  width: clamp(35vh, 65vh, 65vh);
+  height: clamp(25vh, 45vh, 45vh);
   transition: transform 0.3s ease;
 }
 .cards article:hover {
@@ -87,7 +87,7 @@ p {
 }
 .cards p {
   font-size: clamp(1rem, 1.8vw, 1.5rem);
-  width: min(90%, 40ch);
+  width: min(100%, 40ch);
 }
 .icon {
   color: #DF1683;
@@ -97,64 +97,42 @@ p {
 .destaques {
   position: relative;
   text-align: center;
-  top: 130vh;
-  z-index: 20;
+  top: 50vh;
+  z-index: 50;
 }
 
 .destaques h1{
+  position: relative;
+  top: 10vh;
   color: white;
   text-shadow: inherit;
 }
 
 /* --- Imagens de Fundo --- */
 .imagens {
-  position: relative;
+  margin-top: -40vh;
   width: 100%;
   height: 100vh;
   z-index: 1;
-  bottom: 70rem;
-}
-
-.cameraClaquete {
-  position: absolute;
-  width: 28%;
-  left: 2%;
-  bottom: 20%;
-  max-width: 540px;
-}
-
-.cadeiraHolofote {
-  position: absolute;
-  width: 28%;
-  right: 2%;
-  bottom: 18%;
-  max-width: 540px;
-}
-
-.tapete {
-  position: relative;
-  width: 100%;
-  bottom: 92rem;
-  z-index: -1;
 }
 
 /* --- Filmes --- */
 .filmes {
-  position: relative;
-  bottom: 90rem;
+  margin-top: 100vh;
   text-align: center;
 }
+
 #explorar {
   position: relative;
   top: 10vh;
   color: white;
 }
-.textoFilmes {
-  color: #DF1683;
-  text-shadow: 2px 2px 4px #df16858f;
-  position: relative;
-  top: -10vh;
+
+.filtros{
+  margin-top: 35vh;
+  margin-bottom: 15vh;
 }
+
 
 /* --- Animação Scroll --- */
 .scroll-reveal {
@@ -167,28 +145,4 @@ p {
   transform: translateY(0);
 }
 
-/* --- Responsividade --- */
-@media (max-width: 1280px) {
-  .imagens {
-    height: 80vh;
-  }
-  .cameraClaquete,
-  .cadeiraHolofote {
-    width: 35%;
-    bottom: 10%;
-  }
-}
 
-@media (max-width: 768px) {
-  .imagens {
-    height: 60vh;
-  }
-  .cameraClaquete,
-  .cadeiraHolofote {
-    width: 45%;
-    bottom: 5%;
-  }
-  .cards {
-    top: 25rem;
-  }
-}

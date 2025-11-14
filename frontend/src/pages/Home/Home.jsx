@@ -1,7 +1,5 @@
 // Imagens
-import cameraClaquete from '../../assets/imagens/cameraClaquete.svg';
-import cadeiraHolofote from "../../assets/imagens/cadeiraHolofote.svg";
-import tapete from '../../assets/imagens/tapete.svg';
+import imgFundo from '../../assets/imagens/imgFundo.svg';
 
 // Componentes
 import LinhaAnimada from '../../components/LinhaAnimada/LinhaAnimada';
@@ -66,25 +64,21 @@ export default function Home() {
         </article>
       </section>
 
+      <div className="imagens">
+        <img src={imgFundo} alt="imagem de objetos de cinema seguido por um tapete vermelho"/>
+      </div>
+
       <section className="destaques scroll-reveal">
-        <h1>Destaques</h1>
-        <LinhaAnimada />
+        <h1 >Destaques</h1>
+        <LinhaAnimada className='linhaAnimada' />
         <Carrossel />
       </section>
 
-      {/* --- Imagens decorativas --- */}
-      <div className="imagens">
-        <img src={cameraClaquete} alt="Câmera e claquete rosa" className="cameraClaquete" />
-        <img src={cadeiraHolofote} alt="Cadeira e holofote de estúdio" className="cadeiraHolofote" />
-      </div>
-
-      <img src={tapete} alt="Tapete rosa" className="tapete" />
 
       <article className="filmes">
-        <h1 id='explorar'>Catálogo de</h1>
-        <LinhaAnimada />
-        <h1 className='textoFilmes'>Filmes</h1>
-        <Filtros />
+        <h1 id='explorar'>Filmes</h1>
+        <LinhaAnimada className='linhaAnimada' />
+        <Filtros className='filtros' />
         <DisplayFilme />
       </article>
     </>
