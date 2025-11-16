@@ -87,11 +87,18 @@
 }
 
 .ficha-tecnica h2 {
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 100;
   margin-bottom: 20px;
   text-shadow: inherit;
   color: #DF1683;
+  align-items: center;
+}
+
+.fichaTitulo{
+  display: flex;
+  align-items: center;
+  gap: 2vh;
 }
 
 .info {

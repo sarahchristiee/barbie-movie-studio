@@ -1,16 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
-
-body {
-  margin: 0;
-  background-color: #f9c3dc;
-}
-
-@font-face {
-  font-family: 'Barbie';
-  src: url('../../assets/fontes/Barbie.ttf') format('truetype');
-}
-
 /* --- Texto inicial --- */
 .textoInicial {
   position: relative;
@@ -62,35 +49,48 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 2vw;
-  top: 35rem;
+  top: 50rem;
   justify-content: center;
   text-align: center;
   z-index: 10;
+  padding: 2rem 1rem;
 }
 
 .cards article {
   background-color: white;
-  padding: 0.8rem;
+  padding: 1rem;
   border-radius: 1rem;
-  width: clamp(35vh, 65vh, 65vh);
-  height: clamp(25vh, 45vh, 45vh);
+  width: clamp(280px, 35vw, 450px);
+  height: clamp(180px, 25vw, 300px);
   transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
+
 .cards article:hover {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 .cards h3 {
-  font-family: "Lilita One";
+  font-family: "Lilita One", cursive;
   color: #DF1683;
-  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  margin-bottom: 0.5rem;
 }
+
 .cards p {
-  font-size: clamp(1rem, 1.8vw, 1.5rem);
-  width: min(100%, 40ch);
+  font-size: clamp(0.9rem, 1.8vw, 1.4rem);
+  width: 90%;
+  max-width: 40ch;
+  margin: 0 auto;
 }
+
 .icon {
   color: #DF1683;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin-bottom: 0.5rem;
 }
 
 /* --- Destaques --- */

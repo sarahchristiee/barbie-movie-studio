@@ -1,0 +1,79 @@
+.solicitacoesContainer {
+    padding: 20px;
+    width: 100%;
+    max-height: 520px;
+    overflow-y: auto;
+    margin: auto;
+    margin-top: 15vh;
+    font-family: 'Lilita One';
+}
+
+/* Título */
+.solicitacoesContainer h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 5rem;
+    font-weight: bold;
+    font-family: 'Barbie';
+}
+
+.baloesWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding: 5vh;
+}
+
+/* Balão */
+.balaoSolicitacao {
+    display: flex;
+    background-color: #FBDDED;
+    border: solid 1px var(--cor-borda);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    padding: 18px 20px;
+    gap: 15px;
+
+    width: 550px;
+    min-height: 60px;
+    align-items: center;
+}
+
+.balaoSolicitacao:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.balaoNovoFilme,
+.balaoEdicao {
+    border-left: 10px solid var(--main-color);
+}
+
+.balaoConteudo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    width: 100%;
+}
+
+.balaoTitulo {
+    font-size: 1.2rem;
+    color: #d63384;
+    margin-bottom: 4px;
+}
+
+.balaoUsuario {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.balaoData {
+    font-size: 0.9rem;
+    color: #777;
+}

@@ -1,40 +1,25 @@
-@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
-
-:root{
- --main-color: #DF1683;
-}
-
-.lilita-one-regular {
-  font-family: "Lilita One", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-
-body, html {
-    width: 100%;
-    margin: 0;
-}
-
-
-nav{
-    display: flex;
-    background-color: rgb(255, 255, 255); 
-    padding: 2vh;
-    gap: 4vh;
-    top: 0;
-    width: 170vh;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10vh;
-    position: fixed;
-    z-index: 100;
-    margin-top: 2vh;
-    box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.445);
+nav {
+  display: flex;
+  background-color: rgb(255, 255, 255); 
+  padding: 2vh;
+  gap: 4vh;
+  top: 0;
+  width: 90%;
+  max-width: 1700px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10vh;
+  position: fixed;
+  z-index: 100;
+  margin-top: 2vh;
+  box-shadow: 4px 4px 6px rgba(0, 0, 0, 0.445);
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .logo{ 
-    width: 35vh;
-    margin-right: 80vh;
+  width: 35vh;
+  margin-right: 80vh;
 }
 
 a{ 
@@ -49,4 +34,61 @@ a{
 
 .navBar{
     justify-items: center;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+
+.userDropdownWrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.userIcon {
+  width: 40px;
+  height: 40px;
+  color: var(--main-color);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 7vh;
+  right: -5vh;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  padding: 0.5rem 0;
+  min-width: 120px;
+  z-index: 100;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--main-color);
+  text-decoration: none;
+  text-align: left;
+  font-size: 3.5vh;
+}
+
+.dropdownItem:hover {
+  color: var(--cor-hover);
+}
+
+.logoutButton {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.5rem 1rem;
+  font-family: "Lilita One";
+  text-align: left;
+  font-size: 3.5vh;
+}
+
+.logoutButton:hover {
+  color: var(--cor-hover);
 }

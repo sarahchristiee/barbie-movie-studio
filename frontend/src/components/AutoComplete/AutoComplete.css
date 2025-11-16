@@ -1,33 +1,44 @@
-.autocomplete-container {
+/* Estilo geral do Autocomplete */
+.MuiAutocomplete-root {
   width: 350px;
   background-color: #ffffff;
   border-radius: 10vh;
   font-family: "Montserrat";
 }
 
-.autocomplete-container .MuiOutlinedInput-root {
-  border-radius: 10vh;
+/* Estilo do TextField */
+.MuiAutocomplete-root .MuiOutlinedInput-root {
+  border-radius: 10vh !important;
   font-family: "Montserrat";
 }
 
-.autocomplete-container .MuiInputLabel-root {
-  color: #DF1683;
-  font-family: "Montserrat";
-}
-
-.search-icon {
-  color: #DF1683;
-}
-
-/* Quando o campo é focado (clicado) */
-.autocomplete-container .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #821e4c !important;
-  font-family: "Montserrat";
-}
-
-/* Cor da seta (ícone dropdown) */
-.autocomplete-container .MuiAutocomplete-popupIndicator {
+/* Cor do label */
+.MuiAutocomplete-root .MuiInputLabel-root {
   color: #DF1683 !important;
   font-family: "Montserrat";
 }
 
+/* Ícone da lupa (se houver via InputProps) */
+.search-icon {
+  color: #DF1683;
+}
+
+/* Borda quando focado */
+.MuiAutocomplete-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #821e4c !important;
+}
+
+/* Cor da borda default */
+.MuiAutocomplete-root .MuiOutlinedInput-notchedOutline {
+  border-color: #DF1683 !important;
+}
+
+/* Cor da seta do dropdown */
+.MuiAutocomplete-popupIndicator {
+  color: #DF1683 !important;
+}
+
+/* Ícone do clear (X) */
+.MuiAutocomplete-clearIndicator {
+  color: #DF1683 !important;
+}

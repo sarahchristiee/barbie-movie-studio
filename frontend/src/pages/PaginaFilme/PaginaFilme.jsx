@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { Clapperboard } from "lucide-react";
 import "./PaginaFilme.css";
 
 export default function PaginaFilme() {
   const { id_filme } = useParams();
   const [filme, setFilme] = useState(null);
   const [erro, setErro] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`http://localhost:8000/filmes/${id_filme}`)
@@ -69,16 +73,26 @@ export default function PaginaFilme() {
       </div>
 
       {/* Ficha Técnica */}
-      <div className="ficha-tecnica">
-        <h2>Ficha Técnica</h2>
-        <div className="info">
-          <p><strong>Ano de lançamento:</strong> {filme.ano}</p>
-          <p><strong>Duração:</strong> {filme.tempo_duracao} min</p>
-          <p><strong>Orçamento:</strong> ${filme.orcamento}</p>
-        </div>
-
-        <button className="botao-editar">Solicitar Edição</button>
+    <div className="ficha-tecnica">
+      <div className="fichaTitulo">
+      <Clapperboard size={40} className="icon" />
+      <h2>Ficha Técnica</h2>
       </div>
+      
+      <div className="info">
+        <p><strong>Título:</strong> {filme.titulo || "Não informado"}</p>
+        <p><strong>Ano de lançamento:</strong> {filme.ano || "Não informado"}</p>
+        <p><strong>Duração:</strong> {filme.tempo_duracao || "Não informado"} min</p>
+        <p><strong>Orçamento:</strong> ${filme.orcamento || "Não informado"}</p>
+        <p><strong>Gênero:</strong> {filme.generos?.join(", ") || "Não informado"}</p>
+        <p><strong>Direção:</strong> {filme.diretores?.join(", ") || "Não informado"}</p>
+        <p><strong>Produção:</strong> {filme.produtoras?.join(", ") || "Não informado"}</p>
+      </div>
+
+      <button className="botao-editar" onClick={() => navigate(`/SolicitarEdicao/${id_filme}`)}>
+        Solicitar Edição
+      </button>
+    </div>
     </div>
   );
 }

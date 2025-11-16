@@ -1,18 +1,15 @@
-import AutoComplete from "../AutoComplete/AutoComplete";
+import AutoCompleteTitulo from "../AutoComplete/AutoCompleteTitulo";
 import MultiSelect from "../MultiSelect/MultiSelect";
-import "./Filtros.css";
+import './Filtros.css';
 
 export default function Filtros({ onFilterTitulo, onFilterGenero, onFilterAno }) {
   return (
     <section className="filtros">
-      
-      {/* FILTRO POR TÍTULO */}
-      <AutoComplete onFilterTitulo={onFilterTitulo} />
 
-      {/* FILTRO POR GÊNERO */}
+      <AutoCompleteTitulo onFilterTitulo={onFilterTitulo} />
+
       <MultiSelect onFilterGenero={onFilterGenero} />
 
-      {/* FILTRO POR ANO */}
       <div className="ano">
         <input
           type="number"

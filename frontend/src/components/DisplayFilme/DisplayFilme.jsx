@@ -1,32 +1,26 @@
-import { useEffect, useState } from "react";
-// 1. Importar o componente Link do React Router DOM
-import { Link } from 'react-router-dom'; 
-import './DisplayFilme.css';
-import '../Style/Variables.css';
+import { Link } from "react-router-dom";
+import "./DisplayFilme.css";
 
-export default function DisplayFilme() {
-  const [filmes, setFilmes] = useState([]);
-
-  // filmes do backend
-  useEffect(() => {
-    fetch("http://localhost:8000/filmes")
-      .then(res => res.json())
-      .then(data => setFilmes(data))
-      .catch(err => console.error("Erro ao carregar filmes:", err));
-  }, []);
-
+export default function DisplayFilme({ filmes }) {
   return (
     <div className="DisplayFilmeContainer">
-      {filmes.map((filme) => (
-        <Link 
-          to={`/PaginaFilme/${filme.id_filme}`}
-          className="DisplayFilme" 
-          key={filme.id_filme}
-        >
-          <img src={filme.poster || ""} alt={filme.titulo} />
-          <p className="nomeFilme">{filme.titulo} - {filme.ano}</p>
-        </Link>
-      ))}
+      {(!filmes || filmes.length === 0) ? (
+        <p className="nenhumFilme">Nenhum filme encontrado</p>
+      ) : (
+        filmes.map((filme) => (
+          <Link
+            className="DisplayFilme"
+            key={filme.id_filme}
+            to={`/PaginaFilme/${filme.id_filme}`}
+          >
+            <img src={filme.poster || ""} alt={filme.titulo} />
+            <div className="meta">
+              <p className="nomeFilme">{filme.titulo}</p>
+              <p className="anoFilme">{filme.ano}</p>
+            </div>
+          </Link>
+        ))
+      )}
     </div>
   );
 }

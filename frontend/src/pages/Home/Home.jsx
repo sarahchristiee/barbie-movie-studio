@@ -16,7 +16,14 @@ import '../../components/Style/Variables.css';
 
 export default function Home() {
 
-  // ==================== ANIMAÇÃO DE SCROLL ====================
+  const [filmes, setFilmes] = useState([]);
+  const [filmesFiltrados, setFilmesFiltrados] = useState([]);
+
+  const [tituloFiltro, setTituloFiltro] = useState("");
+  const [generosFiltro, setGenerosFiltro] = useState([]);
+  const [anoFiltro, setAnoFiltro] = useState("");
+
+  // Scroll
   useEffect(() => {
     const elements = document.querySelectorAll(".scroll-reveal");
     const observer = new IntersectionObserver((entries) => {
@@ -32,39 +39,38 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  // ==================== ESTADOS ====================
-  const [filmes, setFilmes] = useState([]);
-  const [filmesFiltrados, setFilmesFiltrados] = useState([]);
+  // Renderiza os filmes
+function carregarFilmes() {
+  let url = "http://localhost:8000/filmes";
 
-  const [tituloFiltro, setTituloFiltro] = useState("");
-  const [generosFiltro, setGenerosFiltro] = useState([]);
-  const [anoFiltro, setAnoFiltro] = useState("");
+  const params = new URLSearchParams();
 
-  // ==================== BUSCAR FILMES DO BACKEND ====================
-  function carregarFilmes() {
-    let url = "http://localhost:8000/filmes";
+  if (tituloFiltro.trim() !== "") params.append("titulo", tituloFiltro);
+  if (generosFiltro.length === 1) params.append("genero", generosFiltro[0]);
 
-    const params = new URLSearchParams();
+  if ([...params].length > 0) url += "?" + params.toString();
 
-    if (tituloFiltro.trim() !== "") params.append("titulo", tituloFiltro);
-    if (generosFiltro.length === 1) params.append("genero", generosFiltro[0]);
+  console.log("URL QUE ESTÁ SENDO ENVIADA →", url); // <-- ADICIONE ISSO
 
-    if ([...params].length > 0) url += "?" + params.toString();
+  fetch(url)
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("RESPOSTA DO BACKEND →", data); // <-- ADICIONE ISSO
+      setFilmes(data);
+    })
+    .catch(err => console.log("Erro ao carregar filmes:", err));
+}
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setFilmes(data);
-      })
-      .catch(err => console.log("Erro ao carregar filmes:", err));
-  }
-
-  // Recarregar quando filtros do backend mudarem
+  // Recarrega
   useEffect(() => {
     carregarFilmes();
   }, [tituloFiltro, generosFiltro]);
 
-  // ==================== FILTRO DO ANO (FRONTEND) ====================
+  useEffect(() => {
+    setFilmesFiltrados(filmes);
+  }, [filmes]);
+
+  // Filtrar por ano
   useEffect(() => {
     if (!anoFiltro) {
       setFilmesFiltrados(filmes);
@@ -132,7 +138,7 @@ export default function Home() {
         />
 
         {/* Lista final de filmes filtrados */}
-        <DisplayFilme filmes={filmesFiltrados} />
+       <DisplayFilme filmes={filmesFiltrados} />
       </article>
     </>
   );
