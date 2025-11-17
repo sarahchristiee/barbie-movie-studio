@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import MultiSelect from "../../components/MultiSelect/MultiSelect";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,8 +7,8 @@ import { getUser } from "../../Auth/Auth";
 import "./EditarAdm.css";
 
 export default function EditarAdm() {
-
   const { id_filme } = useParams();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [titulo, setTitulo] = useState("");
@@ -23,9 +23,12 @@ export default function EditarAdm() {
   const [produtora, setProdutora] = useState("");
 
   useEffect(() => {
-    fetch(`http://localhost:8000/filmes/${id_filme}`)
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchFilme = async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/filmes/${id_filme}`);
+        if (!res.ok) throw new Error("Erro ao buscar filme");
+        const data = await res.json();
+
         setTitulo(data.titulo || "");
         setAno(data.ano || "");
         setOrcamento(data.orcamento || "");
@@ -34,12 +37,16 @@ export default function EditarAdm() {
         setTrailer(data.trailer || "");
         setSinopse(data.sinopse || "");
         setGenerosSelecionados(data.generos || []);
-        setDiretor(data.diretores?.join(", ") || "");
-        setProdutora(data.produtoras?.join(", ") || "");
+        setDiretor(data.diretor || "");
+        setProdutora(data.produtora || "");
 
         setLoading(false);
-      })
-      .catch(() => toast.error("Erro ao carregar filme"));
+      } catch (err) {
+        toast.error("Erro ao carregar filme");
+        console.error(err);
+      }
+    };
+    fetchFilme();
   }, [id_filme]);
 
   const handleSubmit = async (e) => {
@@ -48,44 +55,52 @@ export default function EditarAdm() {
     const user = getUser();
     const token = user?.token;
 
-    if (user.role !== "admin") {
+    if (!token || user.role !== "admin") {
       toast.error("Apenas administradores podem editar diretamente.");
       return;
     }
 
+    // Garantir que generos seja array de strings
+    const generos = generosSelecionados.map((g) =>
+      typeof g === "string" ? g : g.value || ""
+    ).filter(Boolean);
+
+    const anoInt = ano ? parseInt(ano, 10) : null;
+
     const data = {
-      titulo,
-      orcamento,
-      tempo_duracao: duracao,
-      ano,
-      poster,
-      trailer,
-      sinopse,
-      generos: generosSelecionados,
-      diretor,
-      produtora
+      titulo: titulo.trim(),
+      orcamento: orcamento ? parseFloat(orcamento) : null,
+      tempo_duracao: duracao.trim() || null,
+      ano: anoInt,
+      poster: poster.trim() || null,
+      trailer: trailer.trim() || null,
+      sinopse: sinopse.trim() || null,
+      generos,
+      diretor: diretor.trim() || null,
+      produtora: produtora.trim() || null,
     };
 
     try {
-      const res = await fetch(`http://localhost:8000/admin/filmes/${id_filme}/editar`, {
-        method: "POST",
+      const res = await fetch(`http://localhost:8000/admin/filmes/${id_filme}`, {
+        method: "PUT", // PUT para atualização direta
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       const json = await res.json();
 
       if (res.ok) {
         toast.success("Filme atualizado com sucesso!");
+        setTimeout(() => navigate(`/HomeAdm`), 1000);
       } else {
-        toast.error(json.error || "Erro ao atualizar");
+        toast.error(json.error || "Erro ao atualizar filme");
       }
-
     } catch (err) {
       toast.error("Erro de conexão");
+      console.error(err);
     }
   };
 
@@ -98,7 +113,6 @@ export default function EditarAdm() {
 
         <form className="admForm" onSubmit={handleSubmit}>
           <div className="admInputsWrapper">
-
             <div className="admCol1">
               <label>Título</label>
               <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
@@ -115,7 +129,7 @@ export default function EditarAdm() {
               <label>Gêneros</label>
               <MultiSelect selected={generosSelecionados} setSelected={setGenerosSelecionados} />
 
-              <label>Diretor(es)</label>
+              <label>Diretor</label>
               <input type="text" value={diretor} onChange={(e) => setDiretor(e.target.value)} />
             </div>
 
@@ -123,8 +137,8 @@ export default function EditarAdm() {
               <label>Sinopse</label>
               <textarea value={sinopse} onChange={(e) => setSinopse(e.target.value)} />
 
-              <label>Produtora(s)</label>
-              <input type="text" value={produtora} onChange={(e) => setProdutora(e.target.value)} />         
+              <label>Produtora</label>
+              <input type="text" value={produtora} onChange={(e) => setProdutora(e.target.value)} />
 
               <label>Poster</label>
               <input type="text" value={poster} onChange={(e) => setPoster(e.target.value)} />
@@ -132,7 +146,6 @@ export default function EditarAdm() {
               <label>Trailer</label>
               <input type="text" value={trailer} onChange={(e) => setTrailer(e.target.value)} />
             </div>
-
           </div>
 
           <div className="admSubmitWrapper">

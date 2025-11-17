@@ -74,7 +74,6 @@ export default function HomeAdm() {
     <>
        <article className='gerenciarFilmes'>
         <h1>Gerenciar Filmes</h1>
-        <LinhaAnimada className='linhaAnimada' />
 
         {/* Filtros 100% funcionais */}
         <Filtros

@@ -36,7 +36,6 @@ export default function Aprovar() {
         });
 
         const all = await res.json();
-
         const encontrado = all.find((s) => String(s.id) === String(id));
         if (!encontrado) {
           toast.error("Solicitação não encontrada.");
@@ -46,22 +45,7 @@ export default function Aprovar() {
         setDados(encontrado);
         const d = encontrado.dados_editados || {};
 
-        // ⬇⬇⬇ CORREÇÃO CRÍTICA: separação por tipo da solicitação
-        if (encontrado.tipo === "novo_filme") {
-          setTitulo(d.titulo ?? "");
-          setAno(d.ano ?? "");
-          setOrcamento(d.orcamento ?? "");
-          setDuracao(d.tempo_duracao ?? "");
-          setPoster(d.poster ?? "");
-          setTrailer(d.trailer ?? "");
-          setSinopse(d.sinopse ?? "");
-
-          // novo filme não tem esses dados
-          setGeneros([]);
-          setDiretor("");
-          setProdutora("");
-
-        } else if (encontrado.tipo === "edicao") {
+        if (encontrado.tipo === "novo_filme" || encontrado.tipo === "edicao") {
           setTitulo(d.titulo ?? "");
           setAno(d.ano ?? "");
           setOrcamento(d.orcamento ?? "");
@@ -73,6 +57,7 @@ export default function Aprovar() {
           setDiretor(d.diretor ?? "");
           setProdutora(d.produtora ?? "");
         }
+
       } catch {
         toast.error("Erro ao carregar solicitação");
       } finally {
@@ -86,12 +71,15 @@ export default function Aprovar() {
   const handleAprovar = async () => {
     const user = getUser();
     const token = user?.token;
+    if (!token || !dados) return;
 
-    const data = {
+    // Atualiza dados.dados_editados com os valores atuais do formulário
+    const dadosAtualizados = {
+      ...dados.dados_editados,
       titulo,
-      ano,
       orcamento,
       tempo_duracao: duracao,
+      ano,
       poster,
       trailer,
       sinopse,
@@ -101,46 +89,64 @@ export default function Aprovar() {
     };
 
     try {
-      const res = await fetch("http://localhost:8000/admin/filmes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await res.json();
-
-      if (res.ok) {
-        toast.success("Filme aprovado!");
-
-        await fetch(`http://localhost:8000/admin/solicitacoes/${id}/rejeitar`, {
+      let res;
+      if (dados.tipo === "novo_filme") {
+        // Novo filme: POST
+        res = await fetch("http://localhost:8000/admin/filmes/novo", {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dadosAtualizados),
         });
-
-        setTimeout(() => navigate("/admin/solicitacoes"), 1200);
+      } else if (dados.tipo === "edicao") {
+        // Edição de filme existente: PUT
+        const idFilme = dados.id_filme;
+        res = await fetch(`http://localhost:8000/admin/filmes/${idFilme}/editar`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(dadosAtualizados),
+        });
       } else {
-        toast.error(result.error);
+        toast.error("Tipo de solicitação desconhecido");
+        return;
       }
-    } catch {
+
+      const json = await res.json();
+      if (res.ok) {
+        toast.success("Solicitação aprovada!");
+        setTimeout(() => navigate("/Solicitacoes"), 1000);
+      } else {
+        toast.error(json.error || "Erro ao aprovar solicitação");
+      }
+    } catch (err) {
       toast.error("Erro ao aprovar");
+      console.error(err);
     }
   };
 
   const handleRecusar = async () => {
     const user = getUser();
     const token = user?.token;
+    if (!token) return;
 
     try {
-      await fetch(`http://localhost:8000/admin/solicitacoes/${id}/rejeitar`, {
+      const res = await fetch(`http://localhost:8000/admin/solicitacoes/${id}/rejeitar`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      toast.success("Solicitação recusada!");
-      setTimeout(() => navigate("/admin/solicitacoes"), 1000);
+      if (res.ok) {
+        toast.success("Solicitação recusada!");
+        setTimeout(() => navigate("/Solicitacoes"), 1000);
+      } else {
+        const errData = await res.json();
+        toast.error(errData.error || "Erro ao recusar solicitação.");
+      }
     } catch {
       toast.error("Erro ao recusar");
     }

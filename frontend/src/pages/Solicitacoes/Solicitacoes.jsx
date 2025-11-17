@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "./Solicitacoes.css";
@@ -32,7 +32,6 @@ export default function Solicitacoes() {
         });
 
         const text = await res.text();
-
         let data;
 
         try {
@@ -76,7 +75,7 @@ export default function Solicitacoes() {
             className={`balaoSolicitacao ${
               s.tipo === "novo_filme" ? "balaoNovoFilme" : "balaoEdicao"
             }`}
-            onClick={() => navigate(`/Solicitacoes/${s.id}`)}
+            onClick={() => navigate(`/aprovar/${s.id}`)} // navega para a página Aprovar com ID
           >
             <div className="balaoTitulo">
               {s.tipo === "novo_filme" ? " Novo Filme" : "Edição de Filme"}

@@ -25,7 +25,7 @@ const Perfil = () => {
 
   const toggleSenha = () => {
     setMostrarSenha(!mostrarSenha);
-    setSenha(prev => (mostrarSenha ? "********" : "nn entendi como puxa a senha na real"));
+    setSenha(prev => (mostrarSenha ? "********" : "é segredo 🤫"));
   };
 
   return (

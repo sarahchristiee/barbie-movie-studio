@@ -83,7 +83,7 @@ function App() {
         />
 
         <Route
-          path="/Solicitacoes/:id"
+          path="/aprovar/:id"
           element={
             <AdminRoute>
               <Aprovar />
@@ -92,7 +92,7 @@ function App() {
         />
 
         <Route
-          path="/EditarAdm"
+          path="/EditarAdm/:id_filme"
           element={
             <AdminRoute>
               <EditarAdm />

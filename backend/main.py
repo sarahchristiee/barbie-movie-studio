@@ -23,7 +23,7 @@ mydb = pymysql.connect(
 # CONFIGURAÇÃO JWT
 # =============================
 SECRET_KEY = "sua_chave_secreta"
-TOKEN_EXP_HOURS = 8  # ajuste conforme desejar
+TOKEN_EXP_HOURS = 8
 
 def gerar_token(usuario_row):
     payload = {
@@ -72,7 +72,7 @@ def validar_token(headers_or_token):
         return None
 
 # =============================
-# FUNÇÕES DE USUÁRIO / AUTH
+# USUÁRIO / AUTH
 # =============================
 def login_usuario(email, senha):
     cursor = mydb.cursor()
@@ -86,10 +86,6 @@ def login_usuario(email, senha):
 # HELPERS
 # =============================
 def _parse_orcamento(val):
-    """
-    Recebe valor que pode ser None, "", string com vírgula ou ponto, int, float, Decimal.
-    Retorna: Decimal ou None
-    """
     if val is None:
         return None
     if isinstance(val, Decimal):
@@ -97,15 +93,19 @@ def _parse_orcamento(val):
     s = str(val).strip()
     if s == "":
         return None
-    # trocar vírgula por ponto e remover espaços
     s = s.replace(",", ".").strip()
     try:
         return Decimal(s)
     except (InvalidOperation, ValueError):
         return None
 
+def _safe_value(v):
+    if isinstance(v, Decimal):
+        return float(v)
+    return v
+
 # =============================
-# FUNÇÕES DE FILMES / CRUD
+# CRUD FILMES
 # =============================
 def carregar_filmes():
     cursor = mydb.cursor()
@@ -125,7 +125,7 @@ def carregar_filmes():
             filmes.append({
                 "id_filme": row["id_filme"],
                 "titulo": row["titulo"],
-                "orcamento": row["orcamento"],
+                "orcamento": _safe_value(row["orcamento"]),
                 "tempo_duracao": str(row["tempo_duracao"]) if row.get("tempo_duracao") is not None else None,
                 "ano": row["ano"],
                 "poster": row.get("link_poster"),
@@ -139,6 +139,7 @@ def carregar_filmes():
 def carregar_filme_por_id(id_filme):
     cursor = mydb.cursor()
     try:
+        # busca principal do filme
         cursor.execute("""
             SELECT f.id_filme, f.titulo, f.orcamento, f.tempo_duracao, f.ano,
                    s.descricao AS sinopse, p.link_poster, t.link_trailer
@@ -153,11 +154,11 @@ def carregar_filme_por_id(id_filme):
             return None
 
         filme = {
-            "id_filme": row["id_filme"],
-            "titulo": row["titulo"],
-            "orcamento": row["orcamento"],
-            "tempo_duracao": str(row["tempo_duracao"]) if row.get("tempo_duracao") is not None else None,
-            "ano": row["ano"],
+            "id_filme": row.get("id_filme"),
+            "titulo": row.get("titulo"),
+            "orcamento": _safe_value(row.get("orcamento")),
+            "tempo_duracao": str(row.get("tempo_duracao")) if row.get("tempo_duracao") else None,
+            "ano": row.get("ano"),
             "poster": row.get("link_poster"),
             "trailer": row.get("link_trailer"),
             "sinopse": row.get("sinopse"),
@@ -170,32 +171,18 @@ def carregar_filme_por_id(id_filme):
             INNER JOIN filme_genero fg ON fg.id_genero = g.id_genero
             WHERE fg.id_filme = %s
         """, (id_filme,))
-        generos = [g["nome_genero"] for g in cursor.fetchall()]
+        generos = [g.get("nome_genero") for g in cursor.fetchall() or []]
         filme["generos"] = generos
 
-        # diretores
-        cursor.execute("""
-            SELECT d.nome, d.sobrenome
-            FROM diretor d
-            INNER JOIN filme_diretor fd ON fd.id_diretor = d.id_diretor
-            WHERE fd.id_filme = %s
-        """, (id_filme,))
-        diretores = [f"{d['nome']} {d['sobrenome']}".strip() for d in cursor.fetchall()]
-        filme["diretores"] = diretores
-
-        # produtoras
-        cursor.execute("""
-            SELECT p.nome_produtora
-            FROM produtora p
-            INNER JOIN filme_produtora fp ON fp.id_produtora = p.id_produtora
-            WHERE fp.id_filme = %s
-        """, (id_filme,))
-        produtoras = [p["nome_produtora"] for p in cursor.fetchall()]
-        filme["produtoras"] = produtoras
-
         return filme
+
+    except Exception as e:
+        print(f"ERRO em carregar_filme_por_id({id_filme}): {e}")
+        return None  # evita 500, front receberá 404 ou None
+
     finally:
         cursor.close()
+
 
 def carregar_generos():
     cursor = mydb.cursor()
@@ -206,17 +193,12 @@ def carregar_generos():
         cursor.close()
 
 # =============================
-# CADASTRO E SOLICITAÇÕES
+# CADASTROS
 # =============================
 def cadastrar_filme_admin(data):
-    """
-    Insere filme na tabela 'filme'. Trata orcamento.
-    Retorna id_filme.
-    """
     cursor = mydb.cursor()
     try:
         orc_db = _parse_orcamento(data.get("orcamento"))
-
         cursor.execute(
             "INSERT INTO filme (titulo, orcamento, tempo_duracao, ano) VALUES (%s,%s,%s,%s)",
             (data["titulo"], orc_db, data.get("tempo_duracao"), data.get("ano"))
@@ -243,21 +225,36 @@ def cadastrar_filme_admin(data):
         cursor.close()
 
 def cadastrar_filme_usuario(data, id_usuario):
-    """
-    Insere um filme na tabela de pendentes (filme_pendente).
-    Converte orcamento para Decimal quando aplicável.
-    Retorna id do registro em filme_pendente.
-    """
     cursor = mydb.cursor()
     try:
         orc_db = _parse_orcamento(data.get("orcamento"))
         cursor.execute("""
-            INSERT INTO filme_pendente (id_usuario,titulo,orcamento,tempo_duracao,ano,poster,trailer,sinopse,status, criado_em)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'pendente', NOW())
-        """, (id_usuario, data["titulo"], orc_db, data.get("tempo_duracao"),
-              data.get("ano"), data.get("poster"), data.get("trailer"), data.get("sinopse"),))
+            INSERT INTO filme_pendente
+            (id_usuario, titulo, orcamento, tempo_duracao, ano, poster, trailer, sinopse, status, criado_em,
+             diretor, produtora)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'pendente', NOW(), %s, %s)
+        """, (
+            id_usuario,
+            data["titulo"],
+            orc_db,
+            data.get("tempo_duracao"),
+            data.get("ano"),
+            data.get("poster"),
+            data.get("trailer"),
+            data.get("sinopse"),
+            data.get("diretor"),
+            data.get("produtora")
+        ))
+        id_filme = cursor.lastrowid
+        # Salvar generos
+        if data.get("generos"):
+            for nome in data["generos"]:
+                cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (nome,))
+                row = cursor.fetchone()
+                if row:
+                    cursor.execute("INSERT INTO filme_pendente_genero (id_filme_pendente, id_genero) VALUES (%s,%s)", (id_filme, row["id_genero"]))
         mydb.commit()
-        return cursor.lastrowid
+        return id_filme
     except Exception as e:
         mydb.rollback()
         raise e
@@ -285,19 +282,14 @@ def solicitar_edicao(id_filme, id_usuario, campo, valor_novo):
         cursor.close()
 
 # =============================
-# UTILS PARA ADMIN: LISTAGEM UNIFICADA
+# LISTAGEM ADMIN UNIFICADA
 # =============================
-def _safe_value(v):
-    if isinstance(v, Decimal):
-        return float(v)
-    return v
-
 def listar_solicitacoes_unificadas():
     cursor = mydb.cursor()
     try:
         resultado = []
 
-        # 1) EDIÇÕES
+        # Edições pendentes
         cursor.execute("""
             SELECT e.id_edicao, e.id_filme, e.campo, e.valor_novo, e.status, e.criado_em,
                    u.nome AS nome_usuario, u.email AS email_usuario
@@ -307,13 +299,11 @@ def listar_solicitacoes_unificadas():
             ORDER BY e.criado_em DESC
         """)
         eds = cursor.fetchall()
-
         for e in eds:
             try:
                 valor_parsed = json.loads(e["valor_novo"]) if e.get("valor_novo") else None
             except:
                 valor_parsed = e.get("valor_novo")
-
             resultado.append({
                 "id": e["id_edicao"],
                 "tipo": "edicao",
@@ -325,7 +315,7 @@ def listar_solicitacoes_unificadas():
                 "criado_em": e.get("criado_em").isoformat() if e.get("criado_em") else None
             })
 
-        # 2) NOVOS FILMES PENDENTES
+        # Filmes pendentes
         cursor.execute("""
             SELECT fp.id_filme_pendente, fp.id_usuario, fp.titulo, fp.orcamento, fp.tempo_duracao, fp.ano,
                    fp.poster, fp.trailer, fp.sinopse, fp.status, fp.criado_em,
@@ -336,7 +326,6 @@ def listar_solicitacoes_unificadas():
             ORDER BY fp.criado_em DESC
         """)
         pens = cursor.fetchall()
-
         for p in pens:
             dados = {
                 "titulo": p.get("titulo"),
@@ -347,7 +336,6 @@ def listar_solicitacoes_unificadas():
                 "trailer": p.get("trailer"),
                 "sinopse": p.get("sinopse"),
             }
-
             resultado.append({
                 "id": p["id_filme_pendente"],
                 "tipo": "novo_filme",
@@ -361,34 +349,58 @@ def listar_solicitacoes_unificadas():
 
         resultado.sort(key=lambda x: x.get("criado_em") or "", reverse=True)
         return resultado
-
     finally:
         cursor.close()
 
-# =============================
+def do_OPTIONS(self):
+    self.send_response(200)
+    self.send_header("Access-Control-Allow-Origin", "*")  # ou seu front
+    self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+    self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+    self.end_headers()
+
+def _send_json(self, data, status=200):
+    self.send_response(status)
+    self.send_header("Content-Type", "application/json")
+    self.send_header("Access-Control-Allow-Origin", "*")
+    self.end_headers()
+    self.wfile.write(json.dumps(data).encode("utf-8"))
+
+def _send_error(self, msg, status=400):
+    self.send_response(status)
+    self.send_header("Content-Type", "application/json")
+    self.send_header("Access-Control-Allow-Origin", "*")
+    self.end_headers()
+    self.wfile.write(json.dumps({"error": msg}).encode("utf-8"))
+
+
 # HANDLER HTTP
-# =============================
 class APIHandler(BaseHTTPRequestHandler):
+
+    def _set_cors_headers(self):
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 
     def _set_common_headers(self):
         self.send_header("Access-Control-Allow-Origin","*")
         self.send_header("Access-Control-Allow-Headers","Content-Type, Authorization")
-        self.send_header("Access-Control-Allow-Methods","GET, POST, OPTIONS")
-
-    def _send_json(self, data, status=200):
-        self.send_response(status)
-        self.send_header("Content-Type","application/json; charset=utf-8")
-        self._set_common_headers()
-        self.end_headers()
-        self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
-
-    def _send_error(self, message, code=400):
-        self._send_json({"error": message}, code)
+        self.send_header("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS")
 
     def do_OPTIONS(self):
         self.send_response(204)
         self._set_common_headers()
         self.end_headers()
+
+    def _send_json(self, data, status=200):
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self._set_cors_headers()
+        self.end_headers()
+        self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+
+    def _send_error(self, msg, status=400):
+        self._send_json({"error": msg}, status)
 
     def do_GET(self):
         try:
@@ -399,7 +411,6 @@ class APIHandler(BaseHTTPRequestHandler):
 
             # GET /filmes
             if path_parts[0] == "filmes":
-                # /filmes
                 if len(path_parts) == 1 or path_parts == ['']:
                     filmes = carregar_filmes()
                     titulo_q = query.get("titulo")
@@ -407,19 +418,21 @@ class APIHandler(BaseHTTPRequestHandler):
                         titulo_q = titulo_q.strip().lower()
                         filmes = [f for f in filmes if titulo_q in (f.get("titulo") or "").lower()]
                     if "genero" in query:
-                        genero = query["genero"].strip().lower()
+                        generos = [g.strip().lower() for g in query["genero"].split(",")]
                         cursor = mydb.cursor()
                         cursor.execute("""
-                            SELECT fg.id_filme FROM filme_genero fg
+                            SELECT fg.id_filme, LOWER(g.nome_genero) AS genero_nome
+                            FROM filme_genero fg
                             JOIN genero g ON fg.id_genero=g.id_genero
-                            WHERE LOWER(g.nome_genero)=%s
-                        """, (genero,))
-                        ids = {row["id_filme"] for row in cursor.fetchall()}
+                        """)
+                        rows = cursor.fetchall()
+                        mapping = {}
+                        for r in rows:
+                            mapping.setdefault(r["id_filme"], []).append(r["genero_nome"])
                         cursor.close()
-                        filmes = [f for f in filmes if f["id_filme"] in ids]
+                        filmes = [f for f in filmes if any(g in mapping.get(f["id_filme"], []) for g in generos)]
                     return self._send_json(filmes)
 
-                # /filmes/:id
                 if len(path_parts) == 2 and path_parts[1].isdigit():
                     filme = carregar_filme_por_id(int(path_parts[1]))
                     if filme:
@@ -427,11 +440,9 @@ class APIHandler(BaseHTTPRequestHandler):
                     else:
                         return self._send_error("Filme não encontrado", 404)
 
-            # GET /generos
             if path == "/generos":
                 return self._send_json(carregar_generos())
 
-            # GET /admin/solicitacoes todas solicitações
             if path == "/admin/solicitacoes":
                 token_data = validar_token(self.headers)
                 if not token_data:
@@ -439,44 +450,32 @@ class APIHandler(BaseHTTPRequestHandler):
                 if token_data.get("role") != "admin":
                     return self._send_error("Acesso negado", 403)
                 try:
-                    lista = listar_solicitacoes_unificadas()
-                    return self._send_json(lista)
+                    return self._send_json(listar_solicitacoes_unificadas())
                 except Exception as e:
                     return self._send_error(f"Erro ao carregar solicitações: {str(e)}", 500)
 
-            # rota não encontrada
             return self._send_error("Rota não encontrada", 404)
-
         except Exception as e:
             return self._send_error(f"Erro interno do servidor (GET): {str(e)}", 500)
 
     def do_POST(self):
         try:
-            # ------------------------------------------------------------
-            # LER JSON DO BODY
-            # ------------------------------------------------------------
             content_length = int(self.headers.get("Content-Length", 0))
             body = self.rfile.read(content_length).decode("utf-8")
-
             try:
                 data = json.loads(body) if body else {}
             except Exception:
                 return self._send_error("JSON inválido", 400)
 
-            # ------------------------------------------------------------
-            # LOGIN (NÃO PRECISA TOKEN)
-            # ------------------------------------------------------------
+            # LOGIN
             if self.path == "/login":
                 email = data.get("email")
                 senha = data.get("senha")
-
                 if not email or not senha:
                     return self._send_error("Email e senha obrigatórios", 400)
-
                 usuario = login_usuario(email, senha)
                 if not usuario:
                     return self._send_error("Credenciais inválidas", 401)
-
                 token = gerar_token(usuario)
                 return self._send_json({
                     "token": token,
@@ -484,9 +483,6 @@ class APIHandler(BaseHTTPRequestHandler):
                     "id": usuario.get("id_usuario")
                 })
 
-            # ------------------------------------------------------------
-            # ROTAS ABAIXO EXIGEM TOKEN
-            # ------------------------------------------------------------
             token_data = validar_token(self.headers)
             if not token_data:
                 return self._send_error("Token inválido ou expirado", 401)
@@ -494,266 +490,197 @@ class APIHandler(BaseHTTPRequestHandler):
             role = token_data.get("role")
             user_id = token_data.get("id")
 
-            # ------------------------------------------------------------
-            # USER CADASTRA FILME (VAI PARA TABELA PENDENTE)
-            # /user/filmes
-            # ------------------------------------------------------------
+            # USER envia filme
             if self.path == "/user/filmes":
                 if role != "user":
                     return self._send_error("Acesso negado", 403)
-
                 if not data.get("titulo"):
                     return self._send_error("Campo 'titulo' é obrigatório", 400)
-
                 novo_id = cadastrar_filme_usuario(data, user_id)
-                return self._send_json({
-                    "mensagem": "Filme enviado para aprovação",
-                    "id_solicitacao": novo_id
-                }, 201)
+                return self._send_json({"mensagem": "Filme enviado para aprovação", "id_solicitacao": novo_id}, 201)
 
-            # ------------------------------------------------------------
-            # USER SOLICITA EDIÇÃO DE FILME
-            # /user/filmes/:id/edicao
-            # ------------------------------------------------------------
+            # USER solicita edição
             if self.path.startswith("/user/filmes/") and self.path.endswith("/edicao"):
                 if role != "user":
                     return self._send_error("Acesso negado", 403)
-
                 try:
-                    id_filme = int(self.path.split("/")[3])
+                    id_filme = int(self.path.split("/")[2])
                 except:
-                    return self._send_error("ID inválido", 400)
-
+                    return self._send_error("ID do filme inválido", 400)
                 campo = data.get("campo")
                 valor = data.get("valor")
-
                 if not campo or valor is None:
-                    return self._send_error("Campos 'campo' e 'valor' são obrigatórios", 400)
-
+                    return self._send_error("Campos obrigatórios: 'campo' e 'valor'", 400)
                 edicao_id = solicitar_edicao(id_filme, user_id, campo, valor)
-                return self._send_json({"mensagem": "Edição solicitada", "id_edicao": edicao_id}, 201)
+                return self._send_json({"mensagem": "Edição enviada para aprovação", "id_edicao": edicao_id}, 201)
 
-            # ------------------------------------------------------------
-            # ADMIN CADASTRA FILME DIRETAMENTE
-            # /admin/filmes
-            # ------------------------------------------------------------
+            # ADMIN cria filme
             if self.path == "/admin/filmes":
                 if role != "admin":
                     return self._send_error("Acesso negado", 403)
-
                 if not data.get("titulo"):
-                    return self._send_error("Campo 'titulo' é obrigatório", 400)
+                    return self._send_error("Campo 'titulo' obrigatório", 400)
+                try:
+                    id_filme = cadastrar_filme_admin(data)
+                    return self._send_json({"mensagem": "Filme cadastrado com sucesso", "id_filme": id_filme}, 201)
+                except Exception as e:
+                    return self._send_error(f"Erro ao cadastrar filme: {str(e)}", 500)
 
-                novo_id = cadastrar_filme_admin(data)
-                return self._send_json({"mensagem": "Filme cadastrado pelo admin", "id_filme": novo_id}, 201)
-
-            # ------------------------------------------------------------
-            # ADMIN EDITA FILME DIRETAMENTE
-            # /admin/filmes/:id/editar
-            # ------------------------------------------------------------
-            if self.path.startswith("/admin/filmes/") and self.path.endswith("/editar"):
+            # ADMIN aprovar/rejeitar
+            if self.path.startswith("/admin/solicitacoes/") and (self.path.endswith("/aprovar") or self.path.endswith("/rejeitar")):
                 if role != "admin":
                     return self._send_error("Acesso negado", 403)
-
                 try:
-                    id_filme = int(self.path.split("/")[3])
+                    partes = self.path.strip("/").split("/")
+                    id_solic = int(partes[2])
+                    acao = partes[3]
                 except:
-                    return self._send_error("ID inválido", 400)
-
+                    return self._send_error("Solicitação inválida", 400)
                 cursor = mydb.cursor()
-
                 try:
-                    valor = data
-
-                    # Conversão orçamento
-                    def parse_orc(v):
-                        if v is None: return None
-                        v = str(v).replace(".", "").replace(",", ".")
-                        try: return float(v)
-                        except: return None
-
-                    orcamento = parse_orc(valor.get("orcamento"))
-
-                    # Atualiza filme
-                    cursor.execute("""
-                        UPDATE filme
-                        SET titulo=%s, orcamento=%s, tempo_duracao=%s, ano=%s
-                        WHERE id_filme=%s
-                    """, (
-                        valor.get("titulo"),
-                        orcamento,
-                        valor.get("tempo_duracao"),
-                        valor.get("ano"),
-                        id_filme
-                    ))
-
-                    # Poster
-                    if "poster" in valor:
-                        cursor.execute("DELETE FROM poster WHERE id_filme=%s", (id_filme,))
-                        cursor.execute(
-                            "INSERT INTO poster (id_filme, link_poster) VALUES (%s,%s)",
-                            (id_filme, valor["poster"])
-                        )
-
-                    # Trailer
-                    if "trailer" in valor:
-                        cursor.execute("DELETE FROM trailer WHERE id_filme=%s", (id_filme,))
-                        cursor.execute(
-                            "INSERT INTO trailer (id_filme, link_trailer) VALUES (%s,%s)",
-                            (id_filme, valor["trailer"])
-                        )
-
-                    # Sinopse
-                    if "sinopse" in valor:
-                        cursor.execute("DELETE FROM sinopse WHERE id_filme=%s", (id_filme,))
-                        cursor.execute(
-                            "INSERT INTO sinopse (id_filme, descricao) VALUES (%s,%s)",
-                            (id_filme, valor["sinopse"])
-                        )
-
-                    # Generos
-                    if "generos" in valor:
-                        cursor.execute("DELETE FROM filme_genero WHERE id_filme=%s", (id_filme,))
-                        for g in valor["generos"]:
-                            cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (g,))
-                            row = cursor.fetchone()
-                            if row:
-                                cursor.execute(
-                                    "INSERT INTO filme_genero (id_filme,id_genero) VALUES (%s,%s)",
-                                    (id_filme, row["id_genero"])
-                                )
-
-                    # Diretores
-                    if "diretor" in valor:
-                        cursor.execute("DELETE FROM filme_diretor WHERE id_filme=%s", (id_filme,))
-                        nomes = [n.strip() for n in valor["diretor"].split(",")]
-                        for nome in nomes:
-                            partes = nome.split(" ")
-                            nome_p = partes[0]
-                            sobrenome = " ".join(partes[1:])
-                            cursor.execute("INSERT INTO diretor (nome, sobrenome) VALUES (%s,%s)",
-                                        (nome_p, sobrenome))
-                            dir_id = cursor.lastrowid
-                            cursor.execute(
-                                "INSERT INTO filme_diretor (id_filme,id_diretor) VALUES (%s,%s)",
-                                (id_filme, dir_id)
-                            )
-
-                    # Produtoras
-                    if "produtora" in valor:
-                        cursor.execute("DELETE FROM filme_produtora WHERE id_filme=%s", (id_filme,))
-                        nomes = [n.strip() for n in valor["produtora"].split(",")]
-                        for nome in nomes:
-                            cursor.execute("INSERT INTO produtora (nome_produtora) VALUES (%s)", (nome,))
-                            id_prod = cursor.lastrowid
-                            cursor.execute(
-                                "INSERT INTO filme_produtora (id_filme,id_produtora) VALUES (%s,%s)",
-                                (id_filme, id_prod)
-                            )
-
-                    mydb.commit()
-                    return self._send_json({"mensagem": "Filme atualizado com sucesso!"})
-
-                except Exception as e:
-                    mydb.rollback()
-                    return self._send_error(f"Erro ao editar filme: {str(e)}", 500)
+                    # Edição
+                    cursor.execute("SELECT * FROM edicao_filme WHERE id_edicao=%s", (id_solic,))
+                    ed = cursor.fetchone()
+                    if ed:
+                        if acao == "aprovar":
+                            campo = ed["campo"]
+                            valor = ed["valor_novo"]
+                            if campo in ["titulo", "orcamento", "tempo_duracao", "ano"]:
+                                valor_real = _parse_orcamento(valor) if campo=="orcamento" else valor
+                                cursor.execute(f"UPDATE filme SET {campo}=%s WHERE id_filme=%s", (valor_real, ed["id_filme"]))
+                            elif campo == "sinopse":
+                                cursor.execute("UPDATE sinopse SET descricao=%s WHERE id_filme=%s", (valor, ed["id_filme"]))
+                            elif campo == "poster":
+                                cursor.execute("UPDATE poster SET link_poster=%s WHERE id_filme=%s", (valor, ed["id_filme"]))
+                            elif campo == "trailer":
+                                cursor.execute("UPDATE trailer SET link_trailer=%s WHERE id_filme=%s", (valor, ed["id_filme"]))
+                            cursor.execute("UPDATE edicao_filme SET status='aprovado' WHERE id_edicao=%s", (id_solic,))
+                        else:
+                            cursor.execute("UPDATE edicao_filme SET status='rejeitado' WHERE id_edicao=%s", (id_solic,))
+                        mydb.commit()
+                        return self._send_json({"mensagem": f"Edição {acao} com sucesso"})
+                    # Filme novo
+                    cursor.execute("SELECT * FROM filme_pendente WHERE id_filme_pendente=%s", (id_solic,))
+                    fp = cursor.fetchone()
+                    if fp:
+                        if acao == "aprovar":
+                            novo_id = cadastrar_filme_admin(fp)
+                            cursor.execute("UPDATE filme_pendente SET status='aprovado' WHERE id_filme_pendente=%s", (id_solic,))
+                            mydb.commit()
+                            return self._send_json({"mensagem": "Filme aprovado e cadastrado", "id_filme": novo_id})
+                        else:
+                            cursor.execute("UPDATE filme_pendente SET status='rejeitado' WHERE id_filme_pendente=%s", (id_solic,))
+                            mydb.commit()
+                            return self._send_json({"mensagem": "Filme rejeitado"})
+                    return self._send_error("Solicitação não encontrada", 404)
                 finally:
                     cursor.close()
 
-            # ------------------------------------------------------------
-            # ADMIN EXCLUI FILME
-            # /admin/filmes/:id/excluir  (aceita também /deletar)
-            # ------------------------------------------------------------
-            if self.path.startswith("/admin/filmes/") and (self.path.endswith("/excluir") or self.path.endswith("/deletar")):
-                # log simples para debug
-                print("DEBUG: rota de delete acionada:", self.path)
-
-                if role != "admin":
-                    return self._send_error("Acesso negado", 403)
-
-                try:
-                    # path esperado: /admin/filmes/<id>/excluir  ou /admin/filmes/<id>/deletar
-                    parts = self.path.strip("/").split("/")
-                    # parts exemplo: ["admin","filmes","13","deletar"] -> id em index 2
-                    # porém em alguns trechos você usou split("/") sem strip, então verificamos comprimento:
-                    if len(parts) >= 3:
-                        # id normalmente está em parts[2]
-                        id_filme = int(parts[2])
-                    else:
-                        return self._send_error("ID inválido", 400)
-                except Exception:
-                    return self._send_error("ID inválido", 400)
-
-                cursor = mydb.cursor()
-                try:
-                    # Confere existência
-                    cursor.execute("SELECT id_filme FROM filme WHERE id_filme=%s", (id_filme,))
-                    if not cursor.fetchone():
-                        return self._send_error("Filme não encontrado", 404)
-
-                    # Dependências (ordem segura)
-                    cursor.execute("DELETE FROM poster WHERE id_filme=%s", (id_filme,))
-                    cursor.execute("DELETE FROM trailer WHERE id_filme=%s", (id_filme,))
-                    cursor.execute("DELETE FROM sinopse WHERE id_filme=%s", (id_filme,))
-
-                    cursor.execute("DELETE FROM filme_genero WHERE id_filme=%s", (id_filme,))
-
-                    # remover relações de diretores (captura ids antes de apagar relação)
-                    cursor.execute("SELECT id_diretor FROM filme_diretor WHERE id_filme=%s", (id_filme,))
-                    diretores = [d["id_diretor"] for d in cursor.fetchall()] if cursor.rowcount else []
-                    cursor.execute("DELETE FROM filme_diretor WHERE id_filme=%s", (id_filme,))
-                    for d_id in diretores:
-                        # opcional: só apagar diretor se não referenciado por outros filmes
-                        cursor.execute("SELECT COUNT(*) AS cnt FROM filme_diretor WHERE id_diretor=%s", (d_id,))
-                        ref = cursor.fetchone()
-                        if ref and ref.get("cnt", 0) == 0:
-                            cursor.execute("DELETE FROM diretor WHERE id_diretor=%s", (d_id,))
-
-                    # produtoras (mesma lógica)
-                    cursor.execute("SELECT id_produtora FROM filme_produtora WHERE id_filme=%s", (id_filme,))
-                    produtoras = [p["id_produtora"] for p in cursor.fetchall()] if cursor.rowcount else []
-                    cursor.execute("DELETE FROM filme_produtora WHERE id_filme=%s", (id_filme,))
-                    for p_id in produtoras:
-                        cursor.execute("SELECT COUNT(*) AS cnt FROM filme_produtora WHERE id_produtora=%s", (p_id,))
-                        ref = cursor.fetchone()
-                        if ref and ref.get("cnt", 0) == 0:
-                            cursor.execute("DELETE FROM produtora WHERE id_produtora=%s", (p_id,))
-
-                    # por fim apaga o filme
-                    cursor.execute("DELETE FROM filme WHERE id_filme=%s", (id_filme,))
-
-                    mydb.commit()
-                    print(f"DEBUG: filme {id_filme} excluído com sucesso")
-                    return self._send_json({"mensagem": "Filme excluído com sucesso!"})
-
-                except Exception as e:
-                    mydb.rollback()
-                    print("ERRO ao excluir filme:", e)
-                    return self._send_error(f"Erro ao excluir filme: {str(e)}", 500)
-                finally:
-                    cursor.close()
-
-            # ------------------------------------------------------------
-            # SE NENHUMA ROTA BATEU
-            # ------------------------------------------------------------
             return self._send_error("Rota não encontrada", 404)
-
         except Exception as e:
             return self._send_error(f"Erro interno do servidor (POST): {str(e)}", 500)
+        
+    
+    def do_DELETE(self):
+        try:
+            parsed = urlparse(self.path)
+            path_parts = parsed.path.strip("/").split("/")
+
+            token_data = validar_token(self.headers)
+            if not token_data:
+                return self._send_error("Token inválido ou expirado", 401)
+            if token_data.get("role") != "admin":
+                return self._send_error("Acesso negado", 403)
+
+            # DELETE /admin/filmes/:id/deletar
+            
+            if len(path_parts) == 3 and path_parts[0] == "admin" and path_parts[1] == "filmes" and path_parts[2].isdigit():
+                id_filme = int(path_parts[2])
+                cursor = mydb.cursor()
+                try:
+                    # Deletar apenas o filme
+                    cursor.execute("DELETE FROM filme WHERE id_filme=%s", (id_filme,))
+                    mydb.commit()
+                    return self._send_json({"mensagem": "Filme removido com sucesso"})
+                except Exception as e:
+                    mydb.rollback()
+                    return self._send_error(f"Erro ao deletar filme: {str(e)}", 500)
+                finally:
+                    cursor.close()
+
+            return self._send_error("Rota DELETE não encontrada", 404)
+        except Exception as e:
+            return self._send_error(f"Erro interno do servidor (DELETE): {str(e)}", 500)
+
+    def do_PUT(self):
+        try:
+            parsed = urlparse(self.path)
+            path_parts = parsed.path.strip("/").split("/")
+
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                data = json.loads(body) if body else {}
+            except:
+                return self._send_error("JSON inválido", 400)
+
+            token_data = validar_token(self.headers)
+            if not token_data:
+                return self._send_error("Token inválido ou expirado", 401)
+            if token_data.get("role") != "admin":
+                return self._send_error("Acesso negado", 403)
+
+            # PUT /admin/filmes/:id
+            if len(path_parts) == 3 and path_parts[0] == "admin" and path_parts[1] == "filmes" and path_parts[2].isdigit():
+                id_filme = int(path_parts[2])
+                cursor = mydb.cursor()
+                try:
+                    # Campos que podem ser atualizados diretamente pelo admin
+                    for campo in ["titulo", "orcamento", "tempo_duracao", "ano", "sinopse", "poster", "trailer", "diretor", "produtora", "generos"]:
+                        if campo in data:
+                            valor = data[campo]
+                            if campo == "orcamento":
+                                valor = _parse_orcamento(valor)
+                            if campo == "sinopse":
+                                cursor.execute("UPDATE sinopse SET descricao=%s WHERE id_filme=%s", (valor, id_filme))
+                            elif campo == "poster":
+                                cursor.execute("UPDATE poster SET link_poster=%s WHERE id_filme=%s", (valor, id_filme))
+                            elif campo == "trailer":
+                                cursor.execute("UPDATE trailer SET link_trailer=%s WHERE id_filme=%s", (valor, id_filme))
+                            elif campo == "generos":
+                                # primeiro remove os gêneros antigos
+                                cursor.execute("DELETE FROM filme_genero WHERE id_filme=%s", (id_filme,))
+                                # depois insere os novos
+                                for nome in valor:  # valor deve ser uma lista de strings
+                                    cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (nome,))
+                                    row = cursor.fetchone()
+                                    if row:
+                                        cursor.execute("INSERT INTO filme_genero (id_filme, id_genero) VALUES (%s, %s)", (id_filme, row["id_genero"]))
+                            else:
+                                # Atualiza campos da tabela filme diretamente
+                                cursor.execute(f"UPDATE filme SET {campo}=%s WHERE id_filme=%s", (valor, id_filme))
+
+                    mydb.commit()
+                    return self._send_json({"mensagem": "Filme atualizado com sucesso"})
+                except Exception as e:
+                    mydb.rollback()
+                    return self._send_error(f"Erro ao atualizar filme: {str(e)}", 500)
+                finally:
+                    cursor.close()
+
+            return self._send_error("Rota PUT não encontrada", 404)
+        except Exception as e:
+            return self._send_error(f"Erro interno do servidor (PUT): {str(e)}", 500)
 
 
-# =============================
-# SERVIDOR
-# =============================
+# Servidor
 def main():
     server_address = ("", 8000)
     httpd = HTTPServer(server_address, APIHandler)
-    print("API rodando em --> http://localhost:8000")
+    print("API ta rodando aqui ó --> http://localhost:8000")
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("Encerrando servidor")
         httpd.server_close()
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
