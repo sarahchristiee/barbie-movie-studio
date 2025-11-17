@@ -1,9 +1,132 @@
-body{
-    margin: 0;
+.rodape {
+    width: 100%;
+    overflow-x: hidden;
 }
 
-img{
-    width: 100%;
-    bottom: 0;
-    margin: 0;
+.rodape footer {
+    background-color: #D1487F; 
+    position: relative;
+    width: 100%; 
+    min-height: 120px; 
+    padding: 30px 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;     
+    color: white; 
+    overflow: hidden; 
+}
+
+
+
+.footerContent {
+    width: 90%; 
+    max-width: 1000px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto; 
+}
+
+
+.rodape .siga, 
+.rodape .entreEmContato {
+    flex: 1; 
+    padding: 0;
+    text-align: center;
+}
+
+.rodape .siga{
+    padding-right: 50px; 
+}
+
+.rodape .entreEmContato {
+    padding-left: 50px; 
+}
+
+.footerHeading {
+    font-size: 1.6rem;
+    font-weight: 500;
+    font-style: italic;
+    margin-bottom: 10px; 
+}
+
+
+.rodape .socialIcons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px; 
+}
+
+
+.contactInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.contactInfo a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    align-items: center;
+    font-family: "Montserrat";
+}
+
+
+.rodape .icon {
+    stroke: white; 
+    width: 30px; 
+    height: 30px;
+}
+
+.rodape .mailIcon {
+    width: 24px;
+    height: 24px;
+    align-items: center;
+}
+
+.rodape .verticalSeparator {
+    width: 1px; 
+    height: 80px; 
+    background-color: white; 
+    margin: 0 20px; 
+}
+
+
+@media (max-width: 768px) {
+    .rodape .footer-content {
+        flex-direction: column; 
+        text-align: center;
+        width: 100%;
+    }
+
+    .rodape .siga, 
+    .rodape .entreEmContato {
+        padding: 10px 0; 
+        text-align: center;
+    }
+    
+    .rodape .siga {
+        padding-right: 0;
+    }
+    
+    .rodape .entreEmContato {
+        padding-left: 0;
+    }
+
+    .rodape .socialIcons {
+        justify-content: center;
+        margin-bottom: 20px; 
+    }
+
+    .rodape .contactInfo {
+        justify-content: center; 
+    }
+
+    .rodape .verticalSeparator {
+        display: none; 
+    }
 }

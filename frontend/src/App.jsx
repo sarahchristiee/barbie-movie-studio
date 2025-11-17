@@ -135,6 +135,8 @@ function App() {
     pauseOnHover
     />
 
+  <Footer />
+      
     </BrowserRouter>
   );
 }
