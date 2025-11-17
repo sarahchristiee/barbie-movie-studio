@@ -33,7 +33,7 @@ export default function PaginaFilmeAdm() {
     if (!window.confirm("Tem certeza que deseja remover este filme?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8000/HomeAdm`, {
+      const res = await fetch(`http://localhost:8000/admin/filmes/${id_filme}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -42,7 +42,7 @@ export default function PaginaFilmeAdm() {
 
       if (res.ok) {
         toast.success("Filme excluído!");
-        setTimeout(() => navigate("/admin/filmes"), 1200);
+        setTimeout(() => navigate("/HomeAdm"), 1200);
       } else {
         // tenta extrair mensagem de erro do JSON, se houver
         let json;
