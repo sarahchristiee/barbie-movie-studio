@@ -7,6 +7,10 @@ export default function Footer(){
 
         <div className="rodape">
           <footer>
+<<<<<<< HEAD
+=======
+
+>>>>>>> 24bf7bae8d1d27eb166dd64d66a623f8c02dddea
 
             <div className="footerContent">
 
