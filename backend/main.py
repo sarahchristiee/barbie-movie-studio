@@ -1,3 +1,4 @@
+# IMPORTAÇÕES
 import json
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
@@ -6,12 +7,11 @@ import pymysql
 import jwt
 import datetime
 
-# =============================
+
 # CONFIGURAÇÃO DO BANCO
-# =============================
 mydb = pymysql.connect(
     host="localhost",
-    user="root",
+    user="root", # oii muda aqui as credencias para o seu seu workbench pra puxar o banco agradeço
     password="root",
     database="filmes",
     charset="utf8mb4",
@@ -19,9 +19,8 @@ mydb = pymysql.connect(
     autocommit=False
 )
 
-# =============================
+
 # CONFIGURAÇÃO JWT
-# =============================
 SECRET_KEY = "sua_chave_secreta"
 TOKEN_EXP_HOURS = 8
 
@@ -71,9 +70,8 @@ def validar_token(headers_or_token):
     except jwt.InvalidTokenError:
         return None
 
-# =============================
-# USUÁRIO / AUTH
-# =============================
+
+# AUTENTICAÇÃO LOGIN USER PADRÃO
 def login_usuario(email, senha):
     cursor = mydb.cursor()
     try:
@@ -82,9 +80,7 @@ def login_usuario(email, senha):
     finally:
         cursor.close()
 
-# =============================
-# HELPERS
-# =============================
+# FORMATAÇÃO DE VAR
 def _parse_orcamento(val):
     if val is None:
         return None
@@ -104,9 +100,8 @@ def _safe_value(v):
         return float(v)
     return v
 
-# =============================
+
 # CRUD FILMES
-# =============================
 def carregar_filmes():
     cursor = mydb.cursor()
     try:
@@ -192,9 +187,8 @@ def carregar_generos():
     finally:
         cursor.close()
 
-# =============================
+
 # CADASTROS
-# =============================
 def cadastrar_filme_admin(data):
     cursor = mydb.cursor()
     try:
@@ -246,7 +240,7 @@ def cadastrar_filme_usuario(data, id_usuario):
             data.get("produtora")
         ))
         id_filme = cursor.lastrowid
-        # Salvar generos
+        # Salvar genero
         if data.get("generos"):
             for nome in data["generos"]:
                 cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (nome,))
@@ -261,6 +255,7 @@ def cadastrar_filme_usuario(data, id_usuario):
     finally:
         cursor.close()
 
+# SOLICITAÇÃO DE EDIÇÃO
 def solicitar_edicao(id_filme, id_usuario, campo, valor_novo):
     cursor = mydb.cursor()
     try:
@@ -281,9 +276,8 @@ def solicitar_edicao(id_filme, id_usuario, campo, valor_novo):
     finally:
         cursor.close()
 
-# =============================
-# LISTAGEM ADMIN UNIFICADA
-# =============================
+
+# LISTAGEM DE FILME NOVO E EDIÇÃO
 def listar_solicitacoes_unificadas():
     cursor = mydb.cursor()
     try:
@@ -352,6 +346,7 @@ def listar_solicitacoes_unificadas():
     finally:
         cursor.close()
 
+
 def do_OPTIONS(self):
     self.send_response(200)
     self.send_header("Access-Control-Allow-Origin", "*")  # ou seu front
@@ -402,6 +397,7 @@ class APIHandler(BaseHTTPRequestHandler):
     def _send_error(self, msg, status=400):
         self._send_json({"error": msg}, status)
 
+    # ROTAS DE GET
     def do_GET(self):
         try:
             parsed = urlparse(self.path)
@@ -458,6 +454,7 @@ class APIHandler(BaseHTTPRequestHandler):
         except Exception as e:
             return self._send_error(f"Erro interno do servidor (GET): {str(e)}", 500)
 
+    # ROTAS DE POST
     def do_POST(self):
         try:
             content_length = int(self.headers.get("Content-Length", 0))
@@ -580,7 +577,7 @@ class APIHandler(BaseHTTPRequestHandler):
         except Exception as e:
             return self._send_error(f"Erro interno do servidor (POST): {str(e)}", 500)
         
-    
+    # ROTAS DE DEL
     def do_DELETE(self):
         try:
             parsed = urlparse(self.path)
@@ -612,6 +609,7 @@ class APIHandler(BaseHTTPRequestHandler):
         except Exception as e:
             return self._send_error(f"Erro interno do servidor (DELETE): {str(e)}", 500)
 
+    # ROTAS DE PUT
     def do_PUT(self):
         try:
             parsed = urlparse(self.path)

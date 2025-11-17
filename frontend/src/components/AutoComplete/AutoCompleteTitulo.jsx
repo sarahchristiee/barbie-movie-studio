@@ -8,6 +8,7 @@ export default function AutoCompleteTitulo({ onFilterTitulo }) {
   const [valor, setValor] = useState(null);
   const [titulos, setTitulos] = useState([]);
 
+  // FECHT
   useEffect(() => {
     fetch("http://localhost:8000/filmes")
       .then(res => res.json())

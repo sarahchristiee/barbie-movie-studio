@@ -5,7 +5,7 @@ import './Perfil.css';
 
 const Perfil = () => {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("********"); // senha inicialmente escondida
+  const [senha, setSenha] = useState("********");
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
   useEffect(() => {
@@ -16,7 +16,6 @@ const Perfil = () => {
         const payloadBase64 = user.token.split(".")[1];
         const decodedPayload = JSON.parse(atob(payloadBase64));
         setEmail(decodedPayload.email || "");
-        // A senha real não é enviada no token, então manteremos oculta
       } catch (err) {
         console.error("Token inválido:", err);
       }
@@ -25,7 +24,7 @@ const Perfil = () => {
 
   const toggleSenha = () => {
     setMostrarSenha(!mostrarSenha);
-    setSenha(prev => (mostrarSenha ? "********" : "é segredo 🤫"));
+    setSenha(prev => (mostrarSenha ? "********" : "é segredo 🤫")); // nn deu tempo de puxar a senha certinho
   };
 
   return (

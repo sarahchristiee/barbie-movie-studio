@@ -21,13 +21,14 @@ export default function Colaborar() {
   e.preventDefault();
   const user = getUser();
   const token = user?.token;
-
+  
+  // verifica token tem q ter né
   if (!token) {
     toast.error("Você precisa estar logado para enviar um filme.");
     return;
   }
 
-  // Validação de tempo_duracao (HH:MM:SS)
+  // Validação de duracao pra ficar formatado certo (HH:MM:SS)
   const duracaoValida = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
   let duracaoParaEnviar = null;
   if (duracao) {
@@ -38,6 +39,7 @@ export default function Colaborar() {
     duracaoParaEnviar = duracao;
   }
 
+  // infos
   const data = {
     titulo,
     orcamento: orcamento ? parseFloat(orcamento) : null,
@@ -66,7 +68,7 @@ export default function Colaborar() {
     if (res.ok) {
       toast.success("Filme enviado para aprovação!");
 
-      // Limpar formulário
+      // limpa o form
       setTitulo(""); 
       setOrcamento(""); 
       setDuracao(""); 

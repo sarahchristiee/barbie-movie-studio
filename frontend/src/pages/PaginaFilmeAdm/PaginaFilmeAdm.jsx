@@ -59,7 +59,7 @@ export default function PaginaFilmeAdm() {
     }
   };
 
-  // EMBED TRAILER
+  // Formatação pro link do youtube funcionar
   const getEmbedUrl = (url) => {
     if (!url) return null;
     if (url.includes("youtube.com/watch?v=")) return `https://www.youtube.com/embed/${url.split("v=")[1].split("&")[0]}`;

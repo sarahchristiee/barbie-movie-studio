@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"; 
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 import "./Solicitacoes.css";
 
 export default function Solicitacoes() {
@@ -15,7 +16,9 @@ export default function Solicitacoes() {
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         token = user?.token;
-      } catch {}
+      } catch (err) {
+        console.error("Erro ao obter token:", err);
+      }
 
       if (!token) {
         toast.error("Você precisa estar logado como administrador.");
@@ -27,29 +30,25 @@ export default function Solicitacoes() {
         const res = await fetch("http://localhost:8000/admin/solicitacoes", {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         });
 
-        const text = await res.text();
-        let data;
-
-        try {
-          data = JSON.parse(text);
-        } catch {
-          console.error("Resposta inválida do servidor:", text);
-          toast.error("Resposta inválida do servidor.");
-          return;
-        }
-
         if (!res.ok) {
-          toast.error(data.error || "Erro ao carregar solicitações");
+          const errorData = await res.json().catch(() => ({}));
+          toast.error(errorData.error || "Erro ao carregar solicitações");
+          setLoading(false);
           return;
         }
 
-        setSolicitacoes(data);
+        const data = await res.json();
+        if (!Array.isArray(data)) {
+          toast.error("Resposta do servidor inesperada");
+          setSolicitacoes([]);
+        } else {
+          setSolicitacoes(data);
+        }
       } catch (err) {
-        console.log(err);
+        console.error(err);
         toast.error("Erro de conexão com o servidor");
       } finally {
         setLoading(false);
@@ -69,29 +68,32 @@ export default function Solicitacoes() {
       )}
 
       <div className="baloesWrapper">
-        {solicitacoes.map((s) => (
-          <div
-            key={s.id}
-            className={`balaoSolicitacao ${
-              s.tipo === "novo_filme" ? "balaoNovoFilme" : "balaoEdicao"
-            }`}
-            onClick={() => navigate(`/aprovar/${s.id}`)} // navega para a página Aprovar com ID
-          >
-            <div className="balaoTitulo">
-              {s.tipo === "novo_filme" ? " Novo Filme" : "Edição de Filme"}
-            </div>
+        {solicitacoes.map((s) => {
+          // Mostra o tipo de solicitação
+          const tipoTexto = s.tipo === "novo_filme" ? "Novo Filme" : "Edição de Filme";
 
-            <div className="balaoUsuario">
-              {s.nome_usuario} ({s.email_usuario})
-            </div>
+          // Nome do usuário
+          const usuarioTexto = `${s.nome_usuario || "Usuário"} (${s.email_usuario || "Email não informado"})`;
 
-            <div className="balaoData">
-              {s.criado_em
-                ? new Date(s.criado_em).toLocaleString("pt-BR")
-                : "Data indisponível"}
+          // Data formatada
+          const dataTexto = s.criado_em
+            ? new Date(s.criado_em).toLocaleString("pt-BR")
+            : "Data indisponível";
+
+          return (
+            <div
+              key={s.id || s.id_solicitacao} 
+              className={`balaoSolicitacao ${
+                s.tipo === "novo_filme" ? "balaoNovoFilme" : "balaoEdicao"
+              }`}
+              onClick={() => navigate(`/aprovar/${s.id || s.id_solicitacao}`)}
+            >
+              <div className="balaoTitulo">{tipoTexto}</div>
+              <div className="balaoUsuario">{usuarioTexto}</div>
+              <div className="balaoData">{dataTexto}</div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

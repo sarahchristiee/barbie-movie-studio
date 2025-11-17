@@ -7,6 +7,7 @@ export default function MultiSelect({ placeholder = "Filtrar por Gênero", onFil
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
 
+  // FECHT
   useEffect(() => {
     fetch("http://localhost:8000/generos")
       .then(res => res.json())
@@ -15,11 +16,12 @@ export default function MultiSelect({ placeholder = "Filtrar por Gênero", onFil
       });
   }, []);
 
-  // atualizar pai sempre que selected mudar
+  // atualiza conforme o user marca e desmarca
   useEffect(() => {
     if (onFilterGenero) onFilterGenero(selected);
   }, [selected]);
 
+  // add e remove os genero
   const handleSelect = (option) => {
     if (selected.includes(option)) {
       setSelected(selected.filter(i => i !== option));

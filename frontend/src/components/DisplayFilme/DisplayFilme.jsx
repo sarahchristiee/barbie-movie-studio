@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { isAdmin } from "../../Auth/Auth"; // função para checar se é admin
+import { isAdmin } from "../../Auth/Auth";
 import "./DisplayFilme.css";
 
 export default function DisplayFilme({ filmes }) {

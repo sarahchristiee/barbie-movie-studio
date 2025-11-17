@@ -1,3 +1,5 @@
+
+// aUTNETICAÇÕES PRA DISTINGUIR AS PÁGINAS DESLOGADO, LOGADO COMO USUÁRIO E LOGADO COMO ADMIN
 export function getUser() {
   const user = localStorage.getItem("user");
   return user ? JSON.parse(user) : null;

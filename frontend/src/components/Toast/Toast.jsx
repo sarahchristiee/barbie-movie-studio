@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import "./Toast.css";
 
+// elemento de notificação
 export default function Toast(message, type = "info") {
   switch(type) {
     case "success":

@@ -18,6 +18,7 @@ export default function EditarUser() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // campos form
     const data = {
       titulo,
       orcamento: orcamento || null,
@@ -29,6 +30,7 @@ export default function EditarUser() {
       generos: generosSelecionados
     };
 
+    // FETCH
     try {
       const res = await fetch("http://localhost:8000/filmes", {
         method: "POST",

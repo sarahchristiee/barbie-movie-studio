@@ -12,7 +12,7 @@ export default function Aprovar() {
   const [dados, setDados] = useState(null);
   const [carregando, setCarregando] = useState(true);
 
-  // Campos editáveis
+  // Campos
   const [titulo, setTitulo] = useState("");
   const [orcamento, setOrcamento] = useState("");
   const [duracao, setDuracao] = useState("");
@@ -24,8 +24,10 @@ export default function Aprovar() {
   const [diretor, setDiretor] = useState("");
   const [produtora, setProdutora] = useState("");
 
+  // FECHT
   useEffect(() => {
     const fetchSolicitacao = async () => {
+      // verifica o usuário
       const user = getUser();
       const token = user?.token;
       if (!token) return;
@@ -68,6 +70,7 @@ export default function Aprovar() {
     fetchSolicitacao();
   }, [id]);
 
+
   const handleAprovar = async () => {
     const user = getUser();
     const token = user?.token;
@@ -101,7 +104,7 @@ export default function Aprovar() {
           body: JSON.stringify(dadosAtualizados),
         });
       } else if (dados.tipo === "edicao") {
-        // Edição de filme existente: PUT
+        // Edição de filme se existe: PUT
         const idFilme = dados.id_filme;
         res = await fetch(`http://localhost:8000/admin/filmes/${idFilme}/editar`, {
           method: "PUT",
@@ -129,6 +132,7 @@ export default function Aprovar() {
     }
   };
 
+  // faz post pra recusar a solicitação
   const handleRecusar = async () => {
     const user = getUser();
     const token = user?.token;

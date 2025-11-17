@@ -5,6 +5,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import './ColaborarAdm.css';
 import { getUser } from "../../Auth/Auth";
 
+// tudo quase igual o de usuário mas ele posta direto
+
 export default function ColaborarAdm() {
 
   const [titulo, setTitulo] = useState("");
@@ -47,6 +49,7 @@ export default function ColaborarAdm() {
       produtora
     };
 
+    // aqui ele posta direto pq é do adm
     try {
       const res = await fetch("http://localhost:8000/admin/filmes", {
         method: "POST",

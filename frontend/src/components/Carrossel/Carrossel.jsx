@@ -5,6 +5,7 @@ import '../Style/Variables.css'
 export default function Carrossel() {
   const [filmes, setFilmes] = useState([]);
 
+  // FECHT
   useEffect(() => {
     fetch("http://localhost:8000/filmes")
       .then(res => res.json())

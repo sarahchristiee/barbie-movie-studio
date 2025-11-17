@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { getUser } from "../../Auth/Auth";
 import "./EditarAdm.css";
 
+// msm coisa do user mais edita direto
+
 export default function EditarAdm() {
   const { id_filme } = useParams();
   const navigate = useNavigate();
