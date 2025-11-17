@@ -1,0 +1,133 @@
+.admContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  margin-top: 5vh;
+}
+
+.admBox {
+  background-color: #fff;
+  width: 90%;
+  max-width: 900px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admTitle {
+  text-align: center;
+  color: #e91e63;
+  font-family: 'barbie', sans-serif;
+  text-shadow: 2px 2px #fff;
+  margin-bottom: 30px;
+  font-size: 4rem;
+}
+
+/* FORM */
+.admForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* WRAPPER */
+.admInputsWrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
+
+/* COLS */
+.admCol1, 
+.admCol2 {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
+
+/* LABELS */
+.admBox label {
+  color: #e91e63;
+  font-family: "Lilita One", sans-serif;
+  text-align: left;
+}
+
+/* INPUTS + TEXTAREA */
+.admForm input,
+.admForm textarea {
+  border-radius: 50px;
+  height: 40px;
+  padding: 10px 15px;
+  border: 2px solid var(--cor-borda);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.admForm textarea {
+  height: 150px;
+  resize: none;
+  border-radius: 20px;
+  padding: 10px;
+}
+
+.admForm input:focus,
+.admForm textarea:focus {
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0;
+}
+
+/* SUBMIT BUTTON */
+.admSubmitWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.admSubmitButton {
+  background-color: #e91e63;
+  color: white;
+  font-family: 'Lilita One', cursive;
+  border: none;
+  width: 180px;
+  height: 50px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-size: 1.2rem;
+}
+
+.admSubmitButton:hover {
+  background-color: #c2185b;
+}
+
+/* MENSAGEM */
+.mensagem {
+  margin-top: 15px;
+  text-align: center;
+  color: #e91e63;
+  font-weight: bold;
+  font-size: 1rem;
+}

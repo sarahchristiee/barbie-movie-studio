@@ -43,20 +43,36 @@ export default function Aprovar() {
           return;
         }
 
-        const d = encontrado.dados_editados;
         setDados(encontrado);
+        const d = encontrado.dados_editados || {};
 
-        // Preencher formulário
-        setTitulo(d.titulo || "");
-        setAno(d.ano || "");
-        setOrcamento(d.orcamento || "");
-        setDuracao(d.tempo_duracao || "");
-        setPoster(d.poster || "");
-        setTrailer(d.trailer || "");
-        setSinopse(d.sinopse || "");
-        setGeneros(d.generos ?? []);
-        setDiretor(d.diretor || "");
-        setProdutora(d.produtora || "");
+        // ⬇⬇⬇ CORREÇÃO CRÍTICA: separação por tipo da solicitação
+        if (encontrado.tipo === "novo_filme") {
+          setTitulo(d.titulo ?? "");
+          setAno(d.ano ?? "");
+          setOrcamento(d.orcamento ?? "");
+          setDuracao(d.tempo_duracao ?? "");
+          setPoster(d.poster ?? "");
+          setTrailer(d.trailer ?? "");
+          setSinopse(d.sinopse ?? "");
+
+          // novo filme não tem esses dados
+          setGeneros([]);
+          setDiretor("");
+          setProdutora("");
+
+        } else if (encontrado.tipo === "edicao") {
+          setTitulo(d.titulo ?? "");
+          setAno(d.ano ?? "");
+          setOrcamento(d.orcamento ?? "");
+          setDuracao(d.tempo_duracao ?? "");
+          setPoster(d.poster ?? "");
+          setTrailer(d.trailer ?? "");
+          setSinopse(d.sinopse ?? "");
+          setGeneros(d.generos ?? []);
+          setDiretor(d.diretor ?? "");
+          setProdutora(d.produtora ?? "");
+        }
       } catch {
         toast.error("Erro ao carregar solicitação");
       } finally {
@@ -99,7 +115,6 @@ export default function Aprovar() {
       if (res.ok) {
         toast.success("Filme aprovado!");
 
-        // deletar solicitação pendente
         await fetch(`http://localhost:8000/admin/solicitacoes/${id}/rejeitar`, {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -125,7 +140,7 @@ export default function Aprovar() {
       });
 
       toast.success("Solicitação recusada!");
-      setTimeout(() => navigate("/Solicitacoes"), 1000);
+      setTimeout(() => navigate("/admin/solicitacoes"), 1000);
     } catch {
       toast.error("Erro ao recusar");
     }

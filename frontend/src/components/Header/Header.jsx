@@ -28,18 +28,25 @@ export default function Header() {
     navigate("/Login");
   };
 
-  // Home normal e de adm
+  // Home normal e HomeAdm
   const homeLink = user?.role === "admin" ? "/HomeAdm" : "/Home";
+
+  // Colaborar normal e ColaborarAdm
+  const colaborarLink = user?.role === "admin" ? "/ColaborarAdm" : "/Colaborar";
 
   return (
     <div className='navBar'>
       <nav>
         <img src={Logo} alt="Logo de claquete e nome do site" className='logo'/>
+
         <Link to={homeLink}>Filmes</Link>
-        <Link to="/Colaborar">Colaborar</Link>
+        <Link to={colaborarLink}>Colaborar</Link>
 
         <div className="userDropdownWrapper">
-          <UserRound className="userIcon" onClick={() => setDropdownOpen(!isDropdownOpen)} />
+          <UserRound 
+            className="userIcon" 
+            onClick={() => setDropdownOpen(!isDropdownOpen)} 
+          />
 
           {isDropdownOpen && (
             <div className="dropdownMenu">
@@ -50,8 +57,7 @@ export default function Header() {
               {user && (
                 <>
                   <Link to="/Perfil" className="dropdownItem">Perfil</Link>
-                  
-                  {/* Opcional para admin */}
+
                   {user.role === "admin" && (
                     <Link to="/Solicitacoes" className="dropdownItem">Solicitações</Link>
                   )}

@@ -19,6 +19,8 @@ import HomeAdm from "./pages/HomeAdm/HomeAdm";
 import Solicitacoes from "./pages/Solicitacoes/Solicitacoes";
 import EditarAdm from "./pages/EditarAdm/EditarAdm";
 import Aprovar from "./pages/Aprovar/Aprovar";
+import PaginaFilmeAdm from "./pages/PaginaFilmeAdm/PaginaFilmeAdm";
+import ColaborarAdm from "./pages/ColaborarAdm/ColaborarAdm";
 
 // rotas
 import ProtectedRoute from "./components/Routes/ProtectedRoute";
@@ -97,6 +99,25 @@ function App() {
             </AdminRoute>
           }
         />
+
+        <Route
+          path="/ColaborarAdm"
+          element={
+            <AdminRoute>
+              <ColaborarAdm />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/PaginaFilmeAdm/:id_filme"
+          element={
+            <AdminRoute>
+              <PaginaFilmeAdm />
+            </AdminRoute>
+          }
+        />
+
       </Routes>
 
       
