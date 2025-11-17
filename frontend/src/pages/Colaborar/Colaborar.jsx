@@ -96,13 +96,13 @@ export default function Colaborar() {
           <div className="inputsWrapper">
             <div className="ladoUm">
               <label>Título</label>
-              <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
+              <input placeholder="Insira o título do filme" type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} required />
 
               <label>Ano</label>
-              <input type="number" value={ano} onChange={(e) => setAno(e.target.value)} />
+              <input placeholder="Ano de lançamento" type="number" value={ano} onChange={(e) => setAno(e.target.value)} />
 
               <label>Orçamento</label>
-              <input type="number" value={orcamento} onChange={(e) => setOrcamento(e.target.value)} />
+              <input placeholder="Investimento do filme" type="number" value={orcamento} onChange={(e) => setOrcamento(e.target.value)} />
 
               <label>Duração</label>
               <input type="text" placeholder="HH:MM:SS" value={duracao} onChange={(e) => setDuracao(e.target.value)} />
@@ -111,21 +111,21 @@ export default function Colaborar() {
               <MultiSelect selected={generosSelecionados} setSelected={setGenerosSelecionados} />
 
               <label>Diretor</label>
-              <input type="text" value={diretor} onChange={(e) => setDiretor(e.target.value)} />
+              <input placeholder="Insira quem dirigiu o filme" type="text" value={diretor} onChange={(e) => setDiretor(e.target.value)} />
             </div>
 
             <div className="ladoDois">
               <label>Sinopse</label>
-              <textarea value={sinopse} onChange={(e) => setSinopse(e.target.value)} />
+              <textarea placeholder="Descreva brevemente a história do filme" value={sinopse} onChange={(e) => setSinopse(e.target.value)} />
 
               <label>Produtora</label>
-              <input type="text" value={produtora} onChange={(e) => setProdutora(e.target.value)} />
+              <input placeholder="Empresa que produziu o filme" type="text" value={produtora} onChange={(e) => setProdutora(e.target.value)} />
 
               <label>Poster</label>
-              <input type="text" value={poster} onChange={(e) => setPoster(e.target.value)} />
+              <input placeholder="Link URL do poster do filme" type="text" value={poster} onChange={(e) => setPoster(e.target.value)} />
 
               <label>Trailer</label>
-              <input type="text" value={trailer} onChange={(e) => setTrailer(e.target.value)} />
+              <input placeholder="Link URL do trailer do filme (Youtube)" type="text" value={trailer} onChange={(e) => setTrailer(e.target.value)} />
             </div>
           </div>
 

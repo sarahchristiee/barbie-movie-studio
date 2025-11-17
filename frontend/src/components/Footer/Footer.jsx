@@ -4,10 +4,9 @@ import { Instagram, X, Mail, Twitch } from 'lucide-react'; // Importa os ícones
 
 export default function Footer(){
     return(
-        // O `rodape` agora terá a cor de fundo sólida
+
         <div className="rodape">
           <footer>
-            {/* REMOVEMOS A TAG <img src={foto} ... /> */}
 
             <div className="footerContent">
 

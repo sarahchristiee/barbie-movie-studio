@@ -73,6 +73,7 @@
   font-size: 1rem;
   box-sizing: border-box;
   transition: all 0.3s ease;
+  font-family: "Montserrat";
 }
 
 .admForm textarea {
