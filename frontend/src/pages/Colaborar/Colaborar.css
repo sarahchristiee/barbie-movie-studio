@@ -29,7 +29,6 @@
   font-size: 4rem;
 }
 
-
 .colaborarForm {
   display: flex;
   flex-direction: column;
@@ -39,11 +38,11 @@
   width: 100%;
 }
 
-
-
-
-label{
+.colaborarBox label {
   text-align: left;
+  color: #e91e63;
+  display: block;
+  font-family: "Lilita One", sans-serif;
 }
 
 .inputsWrapper {
@@ -62,17 +61,8 @@ label{
   gap: 15px;
 }
 
-.submitWrapper {
-  width: 100%;
-}
-
-.colaborarBox label {
-  color: #e91e63;
-  display: block;
-  font-family: "Lilita One", sans-serif;
-}
-
-.colaborarForm input {
+/* LIMITADO APENAS AOS INPUTS DA PAGINA */
+.colaborarBox .colaborarForm input {
   border-radius: 50px;
   height: 40px;
   padding: 10px 15px;
@@ -83,39 +73,13 @@ label{
   font-family: "Montserrat";
 }
 
-textarea::placeholder{
-  font-family: "Montserrat";
-}
-
-.colaborarForm {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  width: 100%;
-}
-
-.colaborarForm input:focus{
-    outline: none;
-}
-
-.colaborarForm textarea:focus{
-    outline: none;
-}
-
-input::placeholder {
+.colaborarBox input::placeholder {
   opacity: 1;
   transition: opacity 0.3s ease;
 }
 
-.ladoUm, .ladoDois {
-  flex: 1;
-  min-width: 300px;
-  display: flex;
-  flex-direction: column;
-  gap: 2vh;
-}
-
-textarea{
+/* LIMITAR O TEXTAREA TAMBÉM */
+.colaborarBox textarea {
   overflow-y: auto;
   resize: none;
   border-radius: 20px;
@@ -124,13 +88,20 @@ textarea{
   font-size: 1rem;
   box-sizing: border-box;
   transition: all 0.3s ease;
+  font-family: "Montserrat";
 }
 
-input:focus::placeholder{
-  opacity: 0;
-} 
+.colaborarBox textarea::placeholder {
+  font-family: "Montserrat";
+}
 
-textarea:focus::placeholder{
+.colaborarBox input:focus,
+.colaborarBox textarea:focus {
+  outline: none;
+}
+
+.colaborarBox input:focus::placeholder,
+.colaborarBox textarea:focus::placeholder {
   opacity: 0;
 }
 
@@ -164,4 +135,3 @@ textarea:focus::placeholder{
   font-weight: bold;
   font-size: 1rem;
 }
-

@@ -1,17 +1,18 @@
+/* CONTAINER */
 .multiSelect {
   position: relative;
   width: 40vh;
   font-family: "Montserrat", sans-serif;
+  box-sizing: border-box !important;
 }
 
-/* Caixa principal */
-.selectBox {
-  border: 2px solid #ffffff;
+/* CAIXA PRINCIPAL */
+.multiSelect .selectBox {
+  border: 2px solid var(--cor-borda);
   border-radius: 12px;
   padding: 10px 15px;
   cursor: pointer;
   background-color: #ffffff;
-  border: 2px solid var(--cor-borda);
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -20,61 +21,32 @@
   font-size: 16px;
 }
 
-/* Quando o dropdown está aberto */
-.selectBox.open {
+/* ABERTO */
+.multiSelect .selectBox.open {
   border-color: var(--cor-borda);
-  background-color: #fff;
 }
 
-/* Placeholder */
-.placeholder {
-  color:  var(--cor-placeholder);
+/* PLACEHOLDER */
+.multiSelect .placeholder {
+  color: var(--cor-placeholder);
   font-family: "Montserrat", sans-serif;
+  pointer-events: none;
 }
 
-/* Tag de seleção */
-.tag {
-  background-color: #ffb6c1;
-  color: #fff;
-  border-radius: 10px;
-  padding: 4px 8px;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 500;
-  animation: pop 0.2s ease;
-}
-
-/* Botão “x” */
-.tag button {
-  background: none;
-  border: none;
-  color: #fff;
-  margin-left: 5px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
-  transition: transform 0.2s ease;
-}
-
-.tag button:hover {
-  transform: scale(1.3);
-}
-
-/* Seta ▾ */
-.arrow {
+/* SETA */
+.multiSelect .arrow {
   margin-left: auto;
   color: #ff1493;
   font-size: 18px;
   transition: transform 0.3s ease;
 }
 
-.selectBox.open .arrow {
+.multiSelect .selectBox.open .arrow {
   transform: rotate(180deg);
 }
 
-/* Dropdown */
-.options {
+/* DROPDOWN */
+.multiSelect .options {
   position: absolute;
   width: 100%;
   background-color: #fffafc;
@@ -82,31 +54,38 @@
   border-radius: 12px;
   margin-top: 6px;
   box-shadow: 0 4px 12px rgba(255, 182, 193, 0.3);
-  z-index: 10;
+  z-index: 9999;
   max-height: 200px;
   overflow-y: auto;
   animation: fadeIn 0.2s ease;
 }
 
-/* Cada opção */
-.option {
+/* OPÇÃO */
+.multiSelect .option {
   display: flex;
   align-items: center;
   padding: 8px 14px;
   gap: 8px;
-  cursor: pointer;
   font-family: "Montserrat", sans-serif;
   font-size: 15px;
   transition: background-color 0.2s ease;
+  box-sizing: border-box;
+  cursor: default;
+  pointer-events: none;
 }
 
-.option:hover {
+.multiSelect .option * {
+  pointer-events: auto;
+}
+
+.multiSelect .option:hover {
   background-color: #ffc9df;
 }
 
-/* Checkbox rosa */
-.option input[type="checkbox"] {
+/* Checkbox isolado */
+.multiSelect .option input[type="checkbox"] {
   accent-color: #ff69b4;
+  cursor: pointer;
 }
 
 /* Animações */
@@ -118,16 +97,5 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes pop {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
   }
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"; 
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 import "./Solicitacoes.css";
@@ -28,9 +28,7 @@ export default function Solicitacoes() {
 
       try {
         const res = await fetch("http://localhost:8000/admin/solicitacoes", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
@@ -45,7 +43,8 @@ export default function Solicitacoes() {
           toast.error("Resposta do servidor inesperada");
           setSolicitacoes([]);
         } else {
-          setSolicitacoes(data);
+          // Filtra apenas solicitações de novo filme ou edição
+          setSolicitacoes(data.filter(s => s.tipo === "novo_filme" || s.tipo === "edicao"));
         }
       } catch (err) {
         console.error(err);
@@ -62,30 +61,22 @@ export default function Solicitacoes() {
     <div className="solicitacoesContainer">
       <h2>Aprovar Filmes</h2>
 
-      {loading && <p>Carregando...</p>}
-      {!loading && solicitacoes.length === 0 && (
-        <p>Nenhuma solicitação pendente.</p>
-      )}
-
       <div className="baloesWrapper">
+        {loading && <p className="loadingText">Carregando...</p>}
+
+        {!loading && solicitacoes.length === 0 && (
+          <p className="nenhumaSolicitacao">Nenhuma solicitação pendente.</p>
+        )}
+
         {solicitacoes.map((s) => {
-          // Mostra o tipo de solicitação
           const tipoTexto = s.tipo === "novo_filme" ? "Novo Filme" : "Edição de Filme";
-
-          // Nome do usuário
           const usuarioTexto = `${s.nome_usuario || "Usuário"} (${s.email_usuario || "Email não informado"})`;
-
-          // Data formatada
-          const dataTexto = s.criado_em
-            ? new Date(s.criado_em).toLocaleString("pt-BR")
-            : "Data indisponível";
+          const dataTexto = s.criado_em ? new Date(s.criado_em).toLocaleString("pt-BR") : "Data indisponível";
 
           return (
             <div
-              key={s.id || s.id_solicitacao} 
-              className={`balaoSolicitacao ${
-                s.tipo === "novo_filme" ? "balaoNovoFilme" : "balaoEdicao"
-              }`}
+              key={s.id || s.id_solicitacao}
+              className={`balaoSolicitacao ${s.tipo === "novo_filme" ? "balaoNovoFilme" : "balaoEdicao"}`}
               onClick={() => navigate(`/aprovar/${s.id || s.id_solicitacao}`)}
             >
               <div className="balaoTitulo">{tipoTexto}</div>
@@ -95,6 +86,8 @@ export default function Solicitacoes() {
           );
         })}
       </div>
+
+      <ToastContainer />
     </div>
   );
 }

@@ -6,8 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { getUser } from "../../Auth/Auth";
 import "./EditarAdm.css";
 
-// msm coisa do user mais edita direto
-
 export default function EditarAdm() {
   const { id_filme } = useParams();
   const navigate = useNavigate();
@@ -24,11 +22,15 @@ export default function EditarAdm() {
   const [diretor, setDiretor] = useState("");
   const [produtora, setProdutora] = useState("");
 
+  // ==========================
+  //   BUSCAR FILME
+  // ==========================
   useEffect(() => {
     const fetchFilme = async () => {
       try {
         const res = await fetch(`http://localhost:8000/filmes/${id_filme}`);
         if (!res.ok) throw new Error("Erro ao buscar filme");
+
         const data = await res.json();
 
         setTitulo(data.titulo || "");
@@ -38,7 +40,22 @@ export default function EditarAdm() {
         setPoster(data.poster || "");
         setTrailer(data.trailer || "");
         setSinopse(data.sinopse || "");
-        setGenerosSelecionados(data.generos || []);
+
+        // Corrigir gêneros vindos do backend
+        const generosCorrigidos = (data.generos || [])
+          .map((g) =>
+            typeof g === "string"
+              ? g
+              : g.nome
+              ? g.nome
+              : g.genero?.nome
+              ? g.genero.nome
+              : null
+          )
+          .filter(Boolean);
+
+        setGenerosSelecionados(generosCorrigidos);
+
         setDiretor(data.diretor || "");
         setProdutora(data.produtora || "");
 
@@ -48,9 +65,13 @@ export default function EditarAdm() {
         console.error(err);
       }
     };
+
     fetchFilme();
   }, [id_filme]);
 
+  // ==========================
+  //   SUBMIT DO ADMIN
+  // ==========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -62,10 +83,9 @@ export default function EditarAdm() {
       return;
     }
 
-    // Garantir que generos seja array de strings
-    const generos = generosSelecionados.map((g) =>
-      typeof g === "string" ? g : g.value || ""
-    ).filter(Boolean);
+    const generos = generosSelecionados
+      .map((g) => (typeof g === "string" ? g : g?.nome || g?.value || ""))
+      .filter(Boolean);
 
     const anoInt = ano ? parseInt(ano, 10) : null;
 
@@ -84,7 +104,7 @@ export default function EditarAdm() {
 
     try {
       const res = await fetch(`http://localhost:8000/admin/filmes/${id_filme}`, {
-        method: "PUT", // PUT para atualização direta
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

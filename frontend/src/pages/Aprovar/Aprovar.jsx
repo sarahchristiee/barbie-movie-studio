@@ -24,10 +24,9 @@ export default function Aprovar() {
   const [diretor, setDiretor] = useState("");
   const [produtora, setProdutora] = useState("");
 
-  // FECHT
+  // FETCH
   useEffect(() => {
     const fetchSolicitacao = async () => {
-      // verifica o usuário
       const user = getUser();
       const token = user?.token;
       if (!token) return;
@@ -55,11 +54,11 @@ export default function Aprovar() {
           setPoster(d.poster ?? "");
           setTrailer(d.trailer ?? "");
           setSinopse(d.sinopse ?? "");
-          setGeneros(d.generos ?? []);
+          // Corrige os gêneros para MultiSelect
+          setGeneros((d.generos ?? []).map((g) => ({ label: g, value: g })));
           setDiretor(d.diretor ?? "");
           setProdutora(d.produtora ?? "");
         }
-
       } catch {
         toast.error("Erro ao carregar solicitação");
       } finally {
@@ -70,69 +69,78 @@ export default function Aprovar() {
     fetchSolicitacao();
   }, [id]);
 
-
   const handleAprovar = async () => {
-    const user = getUser();
-    const token = user?.token;
-    if (!token || !dados) return;
+  const user = getUser();
+  const token = user?.token;
+  if (!token || !dados) {
+    toast.error("Usuário não autenticado ou dados da solicitação ausentes.");
+    return;
+  }
 
-    // Atualiza dados.dados_editados com os valores atuais do formulário
-    const dadosAtualizados = {
-      ...dados.dados_editados,
-      titulo,
-      orcamento,
-      tempo_duracao: duracao,
-      ano,
-      poster,
-      trailer,
-      sinopse,
-      generos,
-      diretor,
-      produtora,
-    };
-
-    try {
-      let res;
-      if (dados.tipo === "novo_filme") {
-        // Novo filme: POST
-        res = await fetch("http://localhost:8000/admin/filmes/novo", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(dadosAtualizados),
-        });
-      } else if (dados.tipo === "edicao") {
-        // Edição de filme se existe: PUT
-        const idFilme = dados.id_filme;
-        res = await fetch(`http://localhost:8000/admin/filmes/${idFilme}/editar`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(dadosAtualizados),
-        });
-      } else {
-        toast.error("Tipo de solicitação desconhecido");
-        return;
-      }
-
-      const json = await res.json();
-      if (res.ok) {
-        toast.success("Solicitação aprovada!");
-        setTimeout(() => navigate("/Solicitacoes"), 1000);
-      } else {
-        toast.error(json.error || "Erro ao aprovar solicitação");
-      }
-    } catch (err) {
-      toast.error("Erro ao aprovar");
-      console.error(err);
-    }
+  // Preparar dados para envio
+  const dadosAtualizados = {
+    ...dados.dados_editados,
+    titulo,
+    orcamento,
+    tempo_duracao: duracao,
+    ano,
+    poster,
+    trailer,
+    sinopse,
+    generos: generos.map(g => (typeof g === "object" ? g.value : g)), // garante array de strings
+    diretor,
+    produtora,
   };
 
-  // faz post pra recusar a solicitação
+  console.log("🔹 Dados enviados para aprovação:", dadosAtualizados);
+
+  try {
+    let res;
+    if (dados.tipo === "novo_filme") {
+      res = await fetch("http://localhost:8000/admin/filmes/novo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dadosAtualizados),
+      });
+    } else if (dados.tipo === "edicao") {
+      const idFilme = dados.id_filme;
+      res = await fetch(`http://localhost:8000/admin/filmes/${idFilme}/editar`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(dadosAtualizados),
+      });
+    } else {
+      toast.error("Tipo de solicitação desconhecido.");
+      return;
+    }
+
+    let json;
+    try {
+      json = await res.json();
+    } catch {
+      json = {};
+    }
+
+    console.log("🔹 Resposta do servidor:", res.status, json);
+
+    if (res.ok) {
+      toast.success("Solicitação aprovada com sucesso!");
+      setTimeout(() => navigate("/Solicitacoes"), 1000);
+    } else {
+      toast.error(json.error || "Erro ao aprovar solicitação");
+    }
+  } catch (err) {
+    console.error("Erro no handleAprovar:", err);
+    toast.error("Erro ao aprovar solicitação");
+  }
+};
+
   const handleRecusar = async () => {
     const user = getUser();
     const token = user?.token;

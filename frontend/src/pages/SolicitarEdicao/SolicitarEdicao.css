@@ -1,0 +1,134 @@
+/* CONTAINER GERAL */
+.editarContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  margin-top: 5vh;
+  box-sizing: border-box;
+}
+
+/* BOX CENTRAL */
+.editarBox {
+  background-color: #fff;
+  width: 90%;
+  max-width: 900px;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* TÍTULO */
+.editarTitulo {
+  text-align: center;
+  color: #e91e63;
+  font-family: "barbie", sans-serif;
+  text-shadow: 2px 2px #fff;
+  margin-bottom: 30px;
+  font-size: 4rem;
+}
+
+/* FORMULÁRIO */
+.editarForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* WRAPPER DUAS COLUNAS */
+.editarInputsWrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  width: 100%;
+}
+
+/* COLUNA 1 E 2 */
+.editarColunaUm,
+.editarColunaDois {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* LABEL */
+.editarBox label {
+  color: #e91e63;
+  font-family: "Lilita One", sans-serif;
+}
+
+/* INPUTS */
+.editarForm input {
+  border-radius: 50px;
+  height: 40px;
+  padding: 10px 15px;
+  border: 2px solid var(--cor-borda);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  font-family: "Montserrat";
+}
+
+.editarForm input:focus {
+  outline: none;
+}
+
+/* TEXTAREA */
+.editarForm textarea {
+  resize: none;
+  height: 150px;
+  border-radius: 20px;
+  padding: 15px;
+  border: 2px solid var(--cor-borda);
+  font-size: 1rem;
+  font-family: "Montserrat";
+  transition: all 0.3s ease;
+}
+
+.editarForm textarea:focus {
+  outline: none;
+}
+
+/* PLACEHOLDER */
+input::placeholder,
+textarea::placeholder {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+input:focus::placeholder,
+textarea:focus::placeholder {
+  opacity: 0;
+}
+
+/* BOTÃO */
+.editarSubmitWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.editarSubmitBtn {
+  background-color: #e91e63;
+  color: white;
+  font-family: "Lilita One", cursive;
+  border: none;
+  width: 160px;
+  height: 45px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.editarSubmitBtn:hover {
+  background-color: #c2185b;
+}

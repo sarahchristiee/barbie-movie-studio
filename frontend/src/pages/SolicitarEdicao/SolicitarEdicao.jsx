@@ -17,10 +17,24 @@ export default function SolicitarEdicao() {
   const [poster, setPoster] = useState("");
   const [trailer, setTrailer] = useState("");
   const [sinopse, setSinopse] = useState("");
-  const [generosSelecionados, setGenerosSelecionados] = useState([]);
+  const [generosSelecionados, setGenerosSelecionados] = useState([]); // [id]
   const [diretor, setDiretor] = useState("");
   const [produtora, setProdutora] = useState("");
+  const [opcoesGeneros, setOpcoesGeneros] = useState([]); // [{id, nome}]
 
+  // 🔥 Carrega todos os gêneros disponíveis
+  useEffect(() => {
+    fetch("http://localhost:8000/generos")
+      .then((res) => res.json())
+      .then((data) => {
+        // transformar em {id, nome}
+        const generosFormatados = data.map((g, index) => ({ id: index, nome: g.nome }));
+        setOpcoesGeneros(generosFormatados);
+      })
+      .catch(() => toast.error("Erro ao carregar gêneros"));
+  }, []);
+
+  // 🔥 Carrega filme original
   useEffect(() => {
     fetch(`http://localhost:8000/filmes/${id_filme}`)
       .then((res) => res.json())
@@ -34,43 +48,52 @@ export default function SolicitarEdicao() {
         setPoster(data.poster || "");
         setTrailer(data.trailer || "");
         setSinopse(data.sinopse || "");
-        setGenerosSelecionados(data.generos || []);
-        setDiretor(data.diretores?.join(", ") || "");
-        setProdutora(data.produtoras?.join(", ") || "");
+
+        // Selecionar gêneros pelo id correspondente
+        const generosIds = (data.generos || []).map((g) => {
+          const generoObj = opcoesGeneros.find((o) => o.nome === g);
+          return generoObj ? generoObj.id : null;
+        }).filter((id) => id !== null);
+        setGenerosSelecionados(generosIds);
+
+        setDiretor((data.diretor || []).join ? data.diretor.join(", ") : data.diretor || "");
+        setProdutora((data.produtora || []).join ? data.produtora.join(", ") : data.produtora || "");
       })
       .catch(() => toast.error("Erro ao carregar filme"));
-  }, [id_filme]);
+  }, [id_filme, opcoesGeneros]);
 
-  // envia 1 solicitação por campo
+  // 🔥 Função para solicitar edição de um campo
   const solicitarCampo = async (campo, valor) => {
     const user = getUser();
     const token = user?.token;
-
-    const res = await fetch(
-      `http://localhost:8000/user/filmes/${id_filme}/edicao`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ campo, valor }),
-      }
-    );
-
-    const json = await res.json();
-    return res.ok;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const user = getUser();
-    if (!user?.token) {
+    if (!token) {
       toast.error("Você precisa estar logado.");
-      return;
+      return false;
     }
 
+    try {
+      const res = await fetch(
+        `http://localhost:8000/user/filmes/${id_filme}/edicao`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ campo, valor }),
+        }
+      );
+      return res.ok;
+    } catch (err) {
+      toast.error("Erro ao enviar solicitação");
+      console.error(err);
+      return false;
+    }
+  };
+
+  // 🔥 Envia todas as alterações
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     let count = 0;
 
     if (titulo !== original.titulo) {
@@ -102,124 +125,73 @@ export default function SolicitarEdicao() {
       count++;
     }
 
-    // comparação de array
-    if (
-      JSON.stringify(generosSelecionados) !==
-      JSON.stringify(original.generos)
-    ) {
-      await solicitarCampo("generos", generosSelecionados);
+    const generosNomes = generosSelecionados.map((id) => {
+      const g = opcoesGeneros.find((o) => o.id === id);
+      return g ? g.nome : null;
+    }).filter((g) => g !== null);
+
+    if (JSON.stringify(generosNomes) !== JSON.stringify(original.generos)) {
+      await solicitarCampo("generos", generosNomes);
       count++;
     }
 
-    if (diretor !== original.diretores?.join(", ")) {
+    if (diretor !== (original.diretor || "").toString()) {
       await solicitarCampo("diretor", diretor);
       count++;
     }
-
-    if (produtora !== original.produtoras?.join(", ")) {
+    if (produtora !== (original.produtora || "").toString()) {
       await solicitarCampo("produtora", produtora);
       count++;
     }
 
     if (count === 0) {
       toast.info("Nenhuma alteração detectada.");
-      return;
+    } else {
+      toast.success("Solicitação de edição enviada!");
     }
-
-    toast.success("Solicitação de edição enviada!");
   };
 
   return (
-    <div className="colaborarContainer">
-      <div className="colaborarBox">
-        <h2 className="colaborarTitle">Editar Filme</h2>
-
-        <form className="colaborarForm" onSubmit={handleSubmit}>
-          <div className="inputsWrapper">
-            {/* COLUNA 1 */}
-            <div className="ladoUm">
+    <div className="editarContainer">
+      <div className="editarBox">
+        <h2 className="editarTitulo">Editar Filme</h2>
+        <form className="editarForm" onSubmit={handleSubmit}>
+          <div className="editarInputsWrapper">
+            <div className="editarColunaUm">
               <label>Título</label>
-              <input
-                type="text"
-                value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
-              />
-
+              <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
               <label>Ano</label>
-              <input
-                type="number"
-                value={ano}
-                onChange={(e) => setAno(e.target.value)}
-              />
-
+              <input type="number" value={ano} onChange={(e) => setAno(e.target.value)} />
               <label>Orçamento</label>
-              <input
-                type="number"
-                value={orcamento}
-                onChange={(e) => setOrcamento(e.target.value)}
-              />
-
+              <input type="number" value={orcamento} onChange={(e) => setOrcamento(e.target.value)} />
               <label>Duração</label>
-              <input
-                type="text"
-                placeholder="HH:MM:SS"
-                value={duracao}
-                onChange={(e) => setDuracao(e.target.value)}
-              />
-
+              <input type="text" placeholder="HH:MM:SS" value={duracao} onChange={(e) => setDuracao(e.target.value)} />
               <label>Gêneros</label>
               <MultiSelect
-                selected={generosSelecionados}
-                setSelected={setGenerosSelecionados}
+                options={opcoesGeneros}
+                value={generosSelecionados}
+                onChange={setGenerosSelecionados}
+                placeholder="Selecionar Gêneros"
               />
-
               <label>Diretor(es)</label>
-              <input
-                type="text"
-                value={diretor}
-                onChange={(e) => setDiretor(e.target.value)}
-              />
+              <input type="text" value={diretor} onChange={(e) => setDiretor(e.target.value)} />
             </div>
-
-            {/* COLUNA 2 */}
-            <div className="ladoDois">
+            <div className="editarColunaDois">
               <label>Sinopse</label>
-              <textarea
-                value={sinopse}
-                onChange={(e) => setSinopse(e.target.value)}
-              />
-
+              <textarea value={sinopse} onChange={(e) => setSinopse(e.target.value)} />
               <label>Produtora(s)</label>
-              <input
-                type="text"
-                value={produtora}
-                onChange={(e) => setProdutora(e.target.value)}
-              />
-
+              <input type="text" value={produtora} onChange={(e) => setProdutora(e.target.value)} />
               <label>Poster (URL)</label>
-              <input
-                type="text"
-                value={poster}
-                onChange={(e) => setPoster(e.target.value)}
-              />
-
+              <input type="text" value={poster} onChange={(e) => setPoster(e.target.value)} />
               <label>Trailer (URL)</label>
-              <input
-                type="text"
-                value={trailer}
-                onChange={(e) => setTrailer(e.target.value)}
-              />
+              <input type="text" value={trailer} onChange={(e) => setTrailer(e.target.value)} />
             </div>
           </div>
-
-          <div className="submitWrapper">
-            <button className="submitButton" type="submit">
-              Enviar Solicitação
-            </button>
+          <div className="editarSubmitWrapper">
+            <button className="editarSubmitBtn" type="submit">Enviar Solicitação</button>
           </div>
         </form>
       </div>
-
       <ToastContainer />
     </div>
   );

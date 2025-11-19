@@ -1,46 +1,49 @@
 .solicitacoesContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     padding: 20px;
-    width: 100%;
-    max-height: 520px;
-    overflow-y: auto;
-    margin: auto;
-    margin-top: 15vh;
     font-family: 'Lilita One';
+    margin-top: 15vh;
+    align-items: center;
 }
 
-/* Título */
+
 .solicitacoesContainer h2 {
     color: white;
     text-align: center;
     margin-bottom: 25px;
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: bold;
     font-family: 'Barbie';
 }
+
 
 .baloesWrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 18px;
-    padding: 5vh;
+    overflow-y: auto;
+    padding: 5vh 0;
+    background-color: white;
+    border-radius: 4vh;
+    width: 40%;
+    height: 40vh;
 }
 
-/* Balão */
+
 .balaoSolicitacao {
     display: flex;
+    flex-direction: column;
     background-color: #FBDDED;
     border: solid 1px var(--cor-borda);
     border-radius: 14px;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-
     padding: 18px 20px;
-    gap: 15px;
-
     width: 550px;
     min-height: 60px;
-    align-items: center;
 }
 
 .balaoSolicitacao:hover {
@@ -51,14 +54,6 @@
 .balaoNovoFilme,
 .balaoEdicao {
     border-left: 10px solid var(--main-color);
-}
-
-.balaoConteudo {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: left;
-    width: 100%;
 }
 
 .balaoTitulo {
@@ -76,4 +71,12 @@
 .balaoData {
     font-size: 0.9rem;
     color: #777;
+}
+
+/* Rodapé fixo ao final */
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 1rem;
 }

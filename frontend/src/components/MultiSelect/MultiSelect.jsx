@@ -1,56 +1,52 @@
 import { useState, useEffect, useRef } from "react";
-import './MultiSelect.css'
+import "./MultiSelect.css";
 
-export default function MultiSelect({ placeholder = "Filtrar por Gênero", onFilterGenero }) {
-  const [options, setOptions] = useState([]);
-  const [selected, setSelected] = useState([]);
+export default function MultiSelect({
+  placeholder = "Filtrar por Gênero",
+  options = [],           // [{ id, nome }]
+  value = [],             // [id1, id2]
+  onChange = () => {}
+}) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
 
-  // FECHT
-  useEffect(() => {
-    fetch("http://localhost:8000/generos")
-      .then(res => res.json())
-      .then(data => {
-        setOptions(data.map(g => g.nome));
-      });
-  }, []);
+  // Para exibir os nomes selecionados
+  const selectedLabels = options
+    .filter(opt => value.includes(opt.id))
+    .map(opt => opt.nome);
 
-  // atualiza conforme o user marca e desmarca
-  useEffect(() => {
-    if (onFilterGenero) onFilterGenero(selected);
-  }, [selected]);
-
-  // add e remove os genero
-  const handleSelect = (option) => {
-    if (selected.includes(option)) {
-      setSelected(selected.filter(i => i !== option));
+  const toggleSelect = (id) => {
+    if (value.includes(id)) {
+      onChange(value.filter(v => v !== id));
     } else {
-      setSelected([...selected, option]);
+      onChange([...value, id]);
     }
   };
 
   return (
     <div className="multiSelect" ref={dropdownRef}>
-      <div className={`selectBox ${open ? "open" : ""}`} onClick={() => setOpen(!open)}>
-        {selected.length > 0 ? (
-          selected.join(", ")
-        ) : (
+      {/* Caixa principal */}
+      <div
+        className={`selectBox ${open ? "open" : ""}`}
+        onClick={() => setOpen(!open)}
+      >
+        {value.length > 0 ? selectedLabels.join(", ") : (
           <span className="placeholder">{placeholder}</span>
         )}
         <span className="arrow">▾</span>
       </div>
 
+      {/* Dropdown */}
       {open && (
         <div className="options">
-          {options.map(option => (
-            <label key={option} className="option">
+          {options.map((opt) => (
+            <label key={opt.id} className="option" onClick={(e) => e.stopPropagation()}>
               <input
                 type="checkbox"
-                checked={selected.includes(option)}
-                onChange={() => handleSelect(option)}
+                checked={value.includes(opt.id)}
+                onChange={() => toggleSelect(opt.id)}
               />
-              {option}
+              {opt.nome}
             </label>
           ))}
         </div>

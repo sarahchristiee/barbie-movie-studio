@@ -100,6 +100,30 @@ def _safe_value(v):
         return float(v)
     return v
 
+# UTIL - upsert simples para sinopse/poster/trailer
+def _upsert_media(table, id_filme, column_name, value):
+    """
+    table: 'sinopse' (col descricao), 'poster' (col link_poster), 'trailer' (col link_trailer)
+    column_name: nome da coluna onde ficará o valor (descricao/link_poster/link_trailer)
+    """
+    cursor = mydb.cursor()
+    try:
+        # checa se já existe
+        cursor.execute(f"SELECT 1 FROM {table} WHERE id_filme=%s", (id_filme,))
+        exists = cursor.fetchone()
+        if exists:
+            cursor.execute(f"UPDATE {table} SET {column_name}=%s WHERE id_filme=%s", (value, id_filme))
+        else:
+            # se table for sinopse usa coluna descricao, se poster/trailer usa link_...
+            if table == "sinopse":
+                cursor.execute("INSERT INTO sinopse (id_filme, descricao) VALUES (%s,%s)", (id_filme, value))
+            elif table == "poster":
+                cursor.execute("INSERT INTO poster (id_filme, link_poster) VALUES (%s,%s)", (id_filme, value))
+            elif table == "trailer":
+                cursor.execute("INSERT INTO trailer (id_filme, link_trailer) VALUES (%s,%s)", (id_filme, value))
+    finally:
+        cursor.close()
+
 
 # CRUD FILMES
 def carregar_filmes():
@@ -107,6 +131,7 @@ def carregar_filmes():
     try:
         cursor.execute("""
             SELECT f.id_filme, f.titulo, f.orcamento, f.tempo_duracao, f.ano,
+                   f.diretor, f.produtora,
                    p.link_poster, t.link_trailer, s.descricao AS sinopse
             FROM filme f
             LEFT JOIN poster p ON f.id_filme = p.id_filme
@@ -123,6 +148,8 @@ def carregar_filmes():
                 "orcamento": _safe_value(row["orcamento"]),
                 "tempo_duracao": str(row["tempo_duracao"]) if row.get("tempo_duracao") is not None else None,
                 "ano": row["ano"],
+                "diretor": row.get("diretor"),
+                "produtora": row.get("produtora"),
                 "poster": row.get("link_poster"),
                 "trailer": row.get("link_trailer"),
                 "sinopse": row.get("sinopse")
@@ -137,6 +164,7 @@ def carregar_filme_por_id(id_filme):
         # busca principal do filme
         cursor.execute("""
             SELECT f.id_filme, f.titulo, f.orcamento, f.tempo_duracao, f.ano,
+                   f.diretor, f.produtora,
                    s.descricao AS sinopse, p.link_poster, t.link_trailer
             FROM filme f
             LEFT JOIN sinopse s ON f.id_filme = s.id_filme
@@ -154,6 +182,8 @@ def carregar_filme_por_id(id_filme):
             "orcamento": _safe_value(row.get("orcamento")),
             "tempo_duracao": str(row.get("tempo_duracao")) if row.get("tempo_duracao") else None,
             "ano": row.get("ano"),
+            "diretor": row.get("diretor"),
+            "produtora": row.get("produtora"),
             "poster": row.get("link_poster"),
             "trailer": row.get("link_trailer"),
             "sinopse": row.get("sinopse"),
@@ -190,20 +220,27 @@ def carregar_generos():
 
 # CADASTROS
 def cadastrar_filme_admin(data):
+    """
+    Recebe um dict 'data' que pode vir de filme_pendente (linhas da tabela) ou do front.
+    Espera, opcionalmente, data['generos'] como lista de nomes de gênero.
+    """
     cursor = mydb.cursor()
     try:
         orc_db = _parse_orcamento(data.get("orcamento"))
+        # agora grava diretor e produtora também
         cursor.execute(
-            "INSERT INTO filme (titulo, orcamento, tempo_duracao, ano) VALUES (%s,%s,%s,%s)",
-            (data["titulo"], orc_db, data.get("tempo_duracao"), data.get("ano"))
+            "INSERT INTO filme (titulo, orcamento, tempo_duracao, ano, diretor, produtora) VALUES (%s,%s,%s,%s,%s,%s)",
+            (data.get("titulo"), orc_db, data.get("tempo_duracao"), data.get("ano"), data.get("diretor"), data.get("produtora"))
         )
         id_filme = cursor.lastrowid
+        # mídia / sinopse (upsert com insert simples pois sabemos que é filme novo)
         if data.get("poster"):
-            cursor.execute("INSERT INTO poster (id_filme, link_poster) VALUES (%s,%s)", (id_filme, data["poster"]))
+            cursor.execute("INSERT INTO poster (id_filme, link_poster) VALUES (%s,%s)", (id_filme, data.get("poster")))
         if data.get("trailer"):
-            cursor.execute("INSERT INTO trailer (id_filme, link_trailer) VALUES (%s,%s)", (id_filme, data["trailer"]))
+            cursor.execute("INSERT INTO trailer (id_filme, link_trailer) VALUES (%s,%s)", (id_filme, data.get("trailer")))
         if data.get("sinopse"):
-            cursor.execute("INSERT INTO sinopse (id_filme, descricao) VALUES (%s,%s)", (id_filme, data["sinopse"]))
+            cursor.execute("INSERT INTO sinopse (id_filme, descricao) VALUES (%s,%s)", (id_filme, data.get("sinopse")))
+        # generos (espera lista de nomes)
         if data.get("generos"):
             for nome in data["generos"]:
                 cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (nome,))
@@ -229,7 +266,7 @@ def cadastrar_filme_usuario(data, id_usuario):
             VALUES (%s,%s,%s,%s,%s,%s,%s,%s,'pendente', NOW(), %s, %s)
         """, (
             id_usuario,
-            data["titulo"],
+            data.get("titulo"),
             orc_db,
             data.get("tempo_duracao"),
             data.get("ano"),
@@ -240,13 +277,19 @@ def cadastrar_filme_usuario(data, id_usuario):
             data.get("produtora")
         ))
         id_filme = cursor.lastrowid
-        # Salvar genero
+        # Salvar genero (se a tabela filme_pendente_genero existir)
         if data.get("generos"):
             for nome in data["generos"]:
                 cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (nome,))
                 row = cursor.fetchone()
                 if row:
-                    cursor.execute("INSERT INTO filme_pendente_genero (id_filme_pendente, id_genero) VALUES (%s,%s)", (id_filme, row["id_genero"]))
+                    # tabela filme_pendente_genero pode não existir no seu esquema inicial;
+                    # se existir, insere; se não, ignora (isso mantém compatibilidade).
+                    try:
+                        cursor.execute("INSERT INTO filme_pendente_genero (id_filme_pendente, id_genero) VALUES (%s,%s)", (id_filme, row["id_genero"]))
+                    except Exception:
+                        # tabela ausente -> ignora
+                        pass
         mydb.commit()
         return id_filme
     except Exception as e:
@@ -259,10 +302,15 @@ def cadastrar_filme_usuario(data, id_usuario):
 def solicitar_edicao(id_filme, id_usuario, campo, valor_novo):
     cursor = mydb.cursor()
     try:
+        # valor_novo pode ser lista/dict -> serializa JSON; se já for string JSON, mantém
         if isinstance(valor_novo, (dict, list)):
             valor_json = json.dumps(valor_novo, ensure_ascii=False)
         else:
-            valor_json = str(valor_novo)
+            # tenta detectar se é um JSON já serializado (string começando com [ ou {)
+            if isinstance(valor_novo, str) and (valor_novo.strip().startswith("{") or valor_novo.strip().startswith("[")):
+                valor_json = valor_novo
+            else:
+                valor_json = str(valor_novo)
 
         cursor.execute("""
             INSERT INTO edicao_filme (id_filme, id_usuario, campo, valor_novo, status, criado_em)
@@ -294,10 +342,14 @@ def listar_solicitacoes_unificadas():
         """)
         eds = cursor.fetchall()
         for e in eds:
-            try:
-                valor_parsed = json.loads(e["valor_novo"]) if e.get("valor_novo") else None
-            except:
-                valor_parsed = e.get("valor_novo")
+            # tenta desserializar valor_novo
+            valor_raw = e.get("valor_novo")
+            valor_parsed = None
+            if valor_raw:
+                try:
+                    valor_parsed = json.loads(valor_raw)
+                except Exception:
+                    valor_parsed = valor_raw
             resultado.append({
                 "id": e["id_edicao"],
                 "tipo": "edicao",
@@ -312,7 +364,7 @@ def listar_solicitacoes_unificadas():
         # Filmes pendentes
         cursor.execute("""
             SELECT fp.id_filme_pendente, fp.id_usuario, fp.titulo, fp.orcamento, fp.tempo_duracao, fp.ano,
-                   fp.poster, fp.trailer, fp.sinopse, fp.status, fp.criado_em,
+                   fp.diretor, fp.produtora, fp.poster, fp.trailer, fp.sinopse, fp.status, fp.criado_em,
                    u.nome AS nome_usuario, u.email AS email_usuario
             FROM filme_pendente fp
             JOIN usuario u ON u.id_usuario = fp.id_usuario
@@ -321,6 +373,19 @@ def listar_solicitacoes_unificadas():
         """)
         pens = cursor.fetchall()
         for p in pens:
+            # busca generos associados ao filme pendente, se existir a tabela
+            generos = []
+            try:
+                cursor.execute("""
+                    SELECT g.nome_genero
+                    FROM filme_pendente_genero fpg
+                    JOIN genero g ON g.id_genero = fpg.id_genero
+                    WHERE fpg.id_filme_pendente=%s
+                """, (p["id_filme_pendente"],))
+                generos = [g["nome_genero"] for g in cursor.fetchall()] or []
+            except Exception:
+                generos = []
+
             dados = {
                 "titulo": p.get("titulo"),
                 "orcamento": _safe_value(p.get("orcamento")),
@@ -329,6 +394,9 @@ def listar_solicitacoes_unificadas():
                 "poster": p.get("poster"),
                 "trailer": p.get("trailer"),
                 "sinopse": p.get("sinopse"),
+                "diretor": p.get("diretor"),
+                "produtora": p.get("produtora"),
+                "generos": generos
             }
             resultado.append({
                 "id": p["id_filme_pendente"],
@@ -542,26 +610,73 @@ class APIHandler(BaseHTTPRequestHandler):
                         if acao == "aprovar":
                             campo = ed["campo"]
                             valor = ed["valor_novo"]
-                            if campo in ["titulo", "orcamento", "tempo_duracao", "ano"]:
-                                valor_real = _parse_orcamento(valor) if campo=="orcamento" else valor
+                            # se for JSON pra generos, tenta desserializar
+                            if campo == "generos":
+                                try:
+                                    lista = json.loads(valor)
+                                except:
+                                    # caso venha como string separada por vírgula
+                                    if isinstance(valor, str):
+                                        lista = [x.strip() for x in valor.split(",") if x.strip()]
+                                    else:
+                                        lista = []
+                                # remove antigos e insere novos
+                                cursor.execute("DELETE FROM filme_genero WHERE id_filme=%s", (ed["id_filme"],))
+                                for nome in lista:
+                                    cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (nome,))
+                                    row = cursor.fetchone()
+                                    if row:
+                                        cursor.execute("INSERT INTO filme_genero (id_filme, id_genero) VALUES (%s, %s)",
+                                                       (ed["id_filme"], row["id_genero"]))
+                            elif campo in ["titulo", "orcamento", "tempo_duracao", "ano", "diretor", "produtora"]:
+                                valor_real = _parse_orcamento(valor) if campo == "orcamento" else valor
                                 cursor.execute(f"UPDATE filme SET {campo}=%s WHERE id_filme=%s", (valor_real, ed["id_filme"]))
                             elif campo == "sinopse":
-                                cursor.execute("UPDATE sinopse SET descricao=%s WHERE id_filme=%s", (valor, ed["id_filme"]))
+                                # upsert sinopse
+                                _upsert_media("sinopse", ed["id_filme"], "descricao", valor)
                             elif campo == "poster":
-                                cursor.execute("UPDATE poster SET link_poster=%s WHERE id_filme=%s", (valor, ed["id_filme"]))
+                                _upsert_media("poster", ed["id_filme"], "link_poster", valor)
                             elif campo == "trailer":
-                                cursor.execute("UPDATE trailer SET link_trailer=%s WHERE id_filme=%s", (valor, ed["id_filme"]))
+                                _upsert_media("trailer", ed["id_filme"], "link_trailer", valor)
+                            # marca edição como aprovada
                             cursor.execute("UPDATE edicao_filme SET status='aprovado' WHERE id_edicao=%s", (id_solic,))
                         else:
                             cursor.execute("UPDATE edicao_filme SET status='rejeitado' WHERE id_edicao=%s", (id_solic,))
                         mydb.commit()
                         return self._send_json({"mensagem": f"Edição {acao} com sucesso"})
+
                     # Filme novo
                     cursor.execute("SELECT * FROM filme_pendente WHERE id_filme_pendente=%s", (id_solic,))
                     fp = cursor.fetchone()
                     if fp:
                         if acao == "aprovar":
-                            novo_id = cadastrar_filme_admin(fp)
+                            # tenta buscar generos relacionados ao pendente (se a tabela existir)
+                            generos = []
+                            try:
+                                cursor.execute("""
+                                    SELECT g.nome_genero
+                                    FROM filme_pendente_genero fpg
+                                    JOIN genero g ON g.id_genero = fpg.id_genero
+                                    WHERE fpg.id_filme_pendente=%s
+                                """, (id_solic,))
+                                generos = [g["nome_genero"] for g in cursor.fetchall()] or []
+                            except Exception:
+                                generos = []
+
+                            # prepara dados para cadastrar_filme_admin
+                            dados_para_cadastro = {
+                                "titulo": fp.get("titulo"),
+                                "orcamento": fp.get("orcamento"),
+                                "tempo_duracao": fp.get("tempo_duracao"),
+                                "ano": fp.get("ano"),
+                                "poster": fp.get("poster"),
+                                "trailer": fp.get("trailer"),
+                                "sinopse": fp.get("sinopse"),
+                                "diretor": fp.get("diretor"),
+                                "produtora": fp.get("produtora"),
+                                "generos": generos
+                            }
+                            novo_id = cadastrar_filme_admin(dados_para_cadastro)
                             cursor.execute("UPDATE filme_pendente SET status='aprovado' WHERE id_filme_pendente=%s", (id_solic,))
                             mydb.commit()
                             return self._send_json({"mensagem": "Filme aprovado e cadastrado", "id_filme": novo_id})
@@ -595,7 +710,7 @@ class APIHandler(BaseHTTPRequestHandler):
                 id_filme = int(path_parts[2])
                 cursor = mydb.cursor()
                 try:
-                    # Deletar apenas o filme
+                    # Deletar apenas o filme (cascata em sinopse/poster/trailer/filme_genero via FK)
                     cursor.execute("DELETE FROM filme WHERE id_filme=%s", (id_filme,))
                     mydb.commit()
                     return self._send_json({"mensagem": "Filme removido com sucesso"})
@@ -640,22 +755,25 @@ class APIHandler(BaseHTTPRequestHandler):
                             if campo == "orcamento":
                                 valor = _parse_orcamento(valor)
                             if campo == "sinopse":
-                                cursor.execute("UPDATE sinopse SET descricao=%s WHERE id_filme=%s", (valor, id_filme))
+                                # upsert sinopse
+                                _upsert_media("sinopse", id_filme, "descricao", valor)
                             elif campo == "poster":
-                                cursor.execute("UPDATE poster SET link_poster=%s WHERE id_filme=%s", (valor, id_filme))
+                                _upsert_media("poster", id_filme, "link_poster", valor)
                             elif campo == "trailer":
-                                cursor.execute("UPDATE trailer SET link_trailer=%s WHERE id_filme=%s", (valor, id_filme))
+                                _upsert_media("trailer", id_filme, "link_trailer", valor)
                             elif campo == "generos":
                                 # primeiro remove os gêneros antigos
                                 cursor.execute("DELETE FROM filme_genero WHERE id_filme=%s", (id_filme,))
                                 # depois insere os novos
-                                for nome in valor:  # valor deve ser uma lista de strings
+                                # espera-se lista de nomes
+                                lista = valor if isinstance(valor, (list, tuple)) else []
+                                for nome in lista:
                                     cursor.execute("SELECT id_genero FROM genero WHERE nome_genero=%s", (nome,))
                                     row = cursor.fetchone()
                                     if row:
                                         cursor.execute("INSERT INTO filme_genero (id_filme, id_genero) VALUES (%s, %s)", (id_filme, row["id_genero"]))
                             else:
-                                # Atualiza campos da tabela filme diretamente
+                                # Atualiza campos da tabela filme diretamente (inclui diretor/produtora)
                                 cursor.execute(f"UPDATE filme SET {campo}=%s WHERE id_filme=%s", (valor, id_filme))
 
                     mydb.commit()
